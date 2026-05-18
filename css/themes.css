@@ -1,0 +1,39 @@
+/* ═══════════════════════════════════════════
+   THEMES — Weather-driven body backgrounds
+   + Mobile safe-area / notch support
+═══════════════════════════════════════════ */
+
+body.sunny        { background: linear-gradient(135deg, #1e3c72, #2a5298, #fbc2eb); }
+body.sunny-extreme{ background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+body.rainy        { background: linear-gradient(135deg, #203a43, #2c5364); }
+body.cloudy       { background: linear-gradient(135deg, #3e5151, #decba4); }
+body.night        { background: linear-gradient(135deg, var(--bg-dark), #302b63, #24243e); }
+body.snowy        { background: linear-gradient(135deg, #6190E8, #A7BFE8); }
+body.stormy-dark  { background: linear-gradient(135deg, #020205, #0a1122, #001224); }
+body.stargazer    { 
+    background: linear-gradient(135deg, #020111, #20124d, #000022); 
+    color: #e0e5ff;
+}
+
+/* ── Safe-area padding for notched iPhones (iPhone X+) and Android ──
+   env(safe-area-inset-*) is ignored on devices without a notch.
+   viewport-fit=cover in the <meta> viewport tag is required for this to work. */
+body {
+    /* Bottom padding ensures content clears the home-indicator bar */
+    padding-bottom: max(40px, env(safe-area-inset-bottom));
+    /* Horizontal padding respects the side notch in landscape */
+    padding-left:  env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+/* ── On mobile, add top safe area so content clears status bar ── */
+@media (max-width: 768px) {
+    body {
+        padding-top: max(20px, env(safe-area-inset-top));
+    }
+
+    /* Soften extreme gradients slightly for OLED battery saving */
+    body.stormy-dark {
+        background: linear-gradient(160deg, #030408, #0a1122);
+    }
+}

@@ -1,0 +1,326 @@
+import { appState } from './state.js';
+import { fetchData, fetchSuggestions } from './api.js';
+import { renderHistory, updateUI, renderHourlyForecast, renderForecastCard } from './ui.js';
+import { updateClock, ding, applyAmbientSounds, createClickEffect } from './features.js';
+import { setupForecastTabs } from './graph.js';
+
+const isMobile = () => window.innerWidth <= 768;
+
+function dismissKeyboard() {
+    if (document.activeElement?.blur) document.activeElement.blur();
+}
+
+// ── App Bootstrap ─────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Fade in once CSS is fully loaded — prevents left-flash on refresh
+    const wrapper = document.querySelector('.app-wrapper');
+    if (wrapper) {
+        wrapper.style.transition = 'opacity 0.3s ease';
+        wrapper.style.opacity = '1';
+    }
+
+    renderHistory(fetchData);
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    document.getElementById('search-btn').addEventListener('click', handleSearch);
+    document.getElementById('city').addEventListener('keypress', e => {
+        if (e.key === 'Enter') handleSearch();
+    });
+    document.getElementById('sound-toggle').addEventListener('click', toggleSound);
+    document.getElementById('unit-toggle').addEventListener('click', toggleUnit);
+    document.getElementById('mic-btn').addEventListener('click', startVoiceSearch);
+    document.getElementById('location-btn').addEventListener('click', fetchCurrentLocation);
+
+    const toggleBtn = document.getElementById('forecast-toggle-btn');
+    const closeBtn  = document.getElementById('close-forecast-btn');
+    if (toggleBtn) toggleBtn.addEventListener('click', toggleForecast);
+    if (closeBtn)  closeBtn.addEventListener('click',  toggleForecast);
+
+    setupSwipeToCloseForecast();
+    setupForecastTabs();
+
+    // ── Autocomplete ──
+    const cityInput      = document.getElementById('city');
+    const suggestionsBox = document.getElementById('suggestions-box');
+    let debounceTimer;
+
+    cityInput.addEventListener('input', e => {
+        const query = e.target.value.trim();
+        clearTimeout(debounceTimer);
+        if (query.length >= 3) {
+            // 300ms debounce keeps suggestion requests manageable as the user types
+            debounceTimer = setTimeout(async () => {
+                const suggestions = await fetchSuggestions(query);
+                renderSuggestions(suggestions);
+            }, 300);
+        } else {
+            hideSuggestions();
+        }
+    });
+
+    // Close suggestions when clicking outside the search box
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.search-box')) hideSuggestions();
+
+        // Spawn click ripple effects everywhere except buttons and inputs
+        if (e.target.closest('button') || e.target.closest('input')) return;
+        const type = (appState.cache?.current?.temp_c <= 0) ? 'ice' : 'drop';
+        createClickEffect(e.clientX, e.clientY, type);
+    });
+
+    // Load the last known city immediately so the app renders right away.
+    // Then try geolocation in the background — if it succeeds within 6s,
+    // silently update to the user's actual location.
+    // This eliminates the 10-12s blank screen caused by waiting for GPS.
+    fetchData(appState.history[0]);
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            p  => fetchData(`${p.coords.latitude},${p.coords.longitude}`),
+            () => {},   // already showing history city, nothing to do on failure
+            { timeout: 6000, maximumAge: 300000 },
+        );
+    }
+
+    // VanillaTilt is too heavy on very narrow screens — destroy it there
+    if (window.innerWidth <= 480) {
+        document.querySelectorAll('[data-tilt]').forEach(el => {
+            if (el.vanillaTilt) el.vanillaTilt.destroy();
+        });
+    }
+});
+
+// ── Autocomplete Rendering ────────────────────────────────
+function renderSuggestions(suggestions) {
+    const box       = document.getElementById('suggestions-box');
+    const cityInput = document.getElementById('city');
+    if (!suggestions?.length) { hideSuggestions(); return; }
+
+    box.innerHTML = '';
+    suggestions.forEach(loc => {
+        const li     = document.createElement('li');
+        li.className = 'suggestion-item';
+        li.setAttribute('role', 'option');
+        const region = loc.region ? loc.region + ', ' : '';
+        li.innerHTML = `
+            <span class="material-icons">location_on</span>
+            ${loc.name}
+            <span class="region">${region}${loc.country}</span>`;
+
+        // touchstart + preventDefault prevents the 300ms tap delay on mobile
+        li.addEventListener('touchstart', e => {
+            e.preventDefault();
+            cityInput.value = loc.name;
+            hideSuggestions();
+            handleSearch();
+        }, { passive: false });
+
+        li.addEventListener('click', () => {
+            cityInput.value = loc.name;
+            hideSuggestions();
+            handleSearch();
+        });
+        box.appendChild(li);
+    });
+    box.classList.add('active');
+}
+
+function hideSuggestions() {
+    document.getElementById('suggestions-box')?.classList.remove('active');
+}
+
+// ── Search ────────────────────────────────────────────────
+function handleSearch() {
+    const input = document.getElementById('city');
+    if (!input.value.trim()) { alert('Please enter a city name!'); return; }
+    hideSuggestions();
+    fetchData(input.value.trim());
+    input.value = '';
+    if (isMobile()) dismissKeyboard();
+}
+
+// ── Sound Toggle ──────────────────────────────────────────
+function toggleSound() {
+    appState.soundEnabled = !appState.soundEnabled;
+    const icon = document.getElementById('sound-icon');
+    if (icon) icon.innerText = appState.soundEnabled ? 'volume_up' : 'volume_off';
+    if (appState.soundEnabled) { ding.currentTime = 0; ding.play().catch(() => {}); }
+    applyAmbientSounds();
+}
+
+// ── Unit Toggle °C / °F ───────────────────────────────────
+function toggleUnit() {
+    appState.isCelsius = !appState.isCelsius;
+    const btn = document.getElementById('unit-toggle');
+    if (btn) btn.innerText = appState.isCelsius ? 'Switch to °F' : 'Switch to °C';
+    if (appState.cache) {
+        updateUI(appState.cache);
+        renderHourlyForecast(appState.cache);
+        renderForecastCard(appState.cache);
+    }
+}
+
+// ── Voice Search ──────────────────────────────────────────
+let activeRecognition = null;
+
+function startVoiceSearch() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { alert('Voice search is not supported in this browser.'); return; }
+
+    const btn = document.getElementById('mic-btn');
+
+    // Tapping the mic button again cancels an active recording
+    if (activeRecognition) {
+        activeRecognition.onend = activeRecognition.onerror = activeRecognition.onresult = null;
+        activeRecognition.abort();
+        activeRecognition = null;
+        btn?.classList.remove('recording', 'listening');
+        return;
+    }
+
+    if (appState.soundEnabled) { ding.currentTime = 0; ding.play().catch(() => {}); }
+
+    const rec     = new SR();
+    activeRecognition = rec;
+    btn?.classList.add('recording', 'listening');
+    rec.start();
+
+    rec.onresult = e => {
+        fetchData(e.results[0][0].transcript);
+        btn?.classList.remove('recording', 'listening');
+        activeRecognition = null;
+    };
+    rec.onerror = rec.onend = () => {
+        btn?.classList.remove('recording', 'listening');
+        if (activeRecognition === rec) activeRecognition = null;
+    };
+}
+
+// ── GPS Location ──────────────────────────────────────────
+function fetchCurrentLocation() {
+    if (!navigator.geolocation) { alert('Geolocation is not supported by your browser.'); return; }
+    const display = document.getElementById('city-display');
+    if (display) display.innerText = 'Locating...';
+    if (isMobile()) dismissKeyboard();
+    navigator.geolocation.getCurrentPosition(
+        p  => fetchData(`${p.coords.latitude},${p.coords.longitude}`),
+        () => alert('Location access denied. Please check your browser permissions.'),
+    );
+}
+
+// ── Forecast Panel Toggle ─────────────────────────────────
+// Button label and aria state update to reflect open/closed status
+function toggleForecast() {
+    const wrapper    = document.getElementById('forecast-wrapper');
+    const btn        = document.getElementById('forecast-toggle-btn');
+    const appWrapper = document.querySelector('.app-wrapper');
+    if (!wrapper || !appWrapper) return;
+
+    wrapper.classList.contains('open')
+        ? _closeForecast(wrapper, btn, appWrapper)
+        : _openForecast(wrapper, btn, appWrapper);
+}
+
+function _openForecast(wrapper, btn, appWrapper) {
+    wrapper.classList.add('open');
+    wrapper.setAttribute('aria-hidden', 'false');
+    appWrapper.classList.add('forecast-open');
+
+    if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-expanded', 'true');
+        const label = document.getElementById('forecast-btn-label');
+        const arrow = document.getElementById('forecast-btn-arrow');
+        if (label) label.textContent = 'Hide Forecast';
+        if (arrow) arrow.textContent = 'expand_less';
+    }
+
+    const graphWrapper = document.getElementById('graph-card-wrapper');
+    if (graphWrapper) graphWrapper.classList.add('show');
+
+    if (window.innerWidth <= 800) {
+        setTimeout(() => {
+            wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 150);
+    }
+}
+
+function _closeForecast(wrapper, btn, appWrapper) {
+    wrapper.classList.remove('open');
+    wrapper.setAttribute('aria-hidden', 'true');
+    appWrapper.classList.remove('forecast-open');
+
+    if (btn) {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-expanded', 'false');
+        const label = document.getElementById('forecast-btn-label');
+        const arrow = document.getElementById('forecast-btn-arrow');
+        if (label) label.textContent = 'See Upcoming Forecasts';
+        if (arrow) arrow.textContent = 'arrow_forward';
+    }
+
+    const graphWrapper = document.getElementById('graph-card-wrapper');
+    if (graphWrapper) graphWrapper.classList.remove('show');
+}
+
+// ── Swipe Down to Close Forecast (mobile) ─────────────────
+// Uses velocity + direction to distinguish a deliberate "swipe to dismiss"
+// from normal scrolling inside the forecast panel.
+//
+// Previous approach checked window.scrollY — but scrolling happens INSIDE
+// the forecast card, so window.scrollY never changes and the panel was
+// closing on every scroll gesture. Fixed by tracking touch velocity and
+// requiring a fast, short, downward-only gesture to trigger close.
+function setupSwipeToCloseForecast() {
+    const forecastCard = document.getElementById('forecast-card');
+    if (!forecastCard) return;
+
+    let startY      = 0;
+    let startX      = 0;
+    let startTime   = 0;
+    let isScrolling = false;   // true once the gesture looks like a scroll
+
+    forecastCard.addEventListener('touchstart', e => {
+        startY      = e.touches[0].clientY;
+        startX      = e.touches[0].clientX;
+        startTime   = Date.now();
+        isScrolling = false;
+    }, { passive: true });
+
+    // During touchmove, decide early if this is a scroll gesture.
+    // If the finger moves more than 12px vertically before 10px horizontally,
+    // mark it as scrolling so touchend won't close the panel.
+    forecastCard.addEventListener('touchmove', e => {
+        const moveY = Math.abs(e.touches[0].clientY - startY);
+        const moveX = Math.abs(e.touches[0].clientX - startX);
+        if (moveY > 12 && moveY > moveX) isScrolling = true;
+    }, { passive: true });
+
+    forecastCard.addEventListener('touchend', e => {
+        const dy       = e.changedTouches[0].clientY - startY;
+        const dx       = Math.abs(e.changedTouches[0].clientX - startX);
+        const duration = Date.now() - startTime;
+        // velocity in px/ms — a deliberate swipe is fast, a scroll is slow
+        const velocity = dy / duration;
+
+        // Only close when ALL conditions are true:
+        //   - deliberate downward motion (> 80px)
+        //   - mostly vertical (not a diagonal scroll)
+        //   - fast gesture (> 0.5 px/ms) — rules out slow content scrolling
+        //   - completed quickly (< 350ms) — rules out long press + slow drag
+        //   - not already detected as a scroll gesture during touchmove
+        if (dy > 80 && dx < 50 && velocity > 0.5 && duration < 350 && !isScrolling) {
+            const wrapper    = document.getElementById('forecast-wrapper');
+            const btn        = document.getElementById('forecast-toggle-btn');
+            const appWrapper = document.querySelector('.app-wrapper');
+            if (wrapper?.classList.contains('open')) {
+                _closeForecast(wrapper, btn, appWrapper);
+                setTimeout(() => {
+                    document.getElementById('main-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        }
+    }, { passive: true });
+}

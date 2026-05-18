@@ -1,0 +1,247 @@
+/* ═══════════════════════════════════════════
+   LAYOUT — Desktop first, responsive below
+═══════════════════════════════════════════ */
+
+.app-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 900px;
+    transition: max-width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Ensure no horizontal bleed */
+    padding: 0 15px;
+}
+
+.app-wrapper.forecast-open {
+    max-width: 1050px; 
+}
+
+.main-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.cards-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 25px;
+    width: 100%;
+}
+
+.main-card-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0; 
+    width: 100%;
+    max-width: 500px;
+    z-index: 2;
+}
+
+.forecast-card-wrapper {
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateX(-40px) scale(0.95);
+    transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                opacity 0.4s ease 0.1s, 
+                transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1;
+}
+
+.forecast-card-wrapper.open {
+    width: 100%;
+    max-width: 500px;
+    opacity: 1;
+    transform: translateX(0) scale(1);
+}
+
+.forecast-card {
+    width: 100%;
+    max-width: 500px;
+}
+
+/* ── Sun tracker transition ── */
+.sun-track-wrapper {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.app-wrapper.forecast-open #sunset-wrapper {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(20px);
+}
+
+/* ══════════════════════════════════════
+   SUN STRIP — Desktop: transparent wrapper
+   so the children keep their absolute positioning
+   relative to .app-wrapper.
+   Mobile: becomes a real flex row above main-content.
+══════════════════════════════════════ */
+#sun-strip {
+    /* display:contents = "invisible" box — children participate in 
+       .app-wrapper layout as if #sun-strip doesn't exist.
+       The sun-track-wrappers keep their position:absolute, 
+       positioned relative to .app-wrapper (which has position:relative). */
+    display: contents;
+}
+
+
+/* ══════════════════════════════════════
+   BREAKPOINT 1: Wide tablet / small laptop
+══════════════════════════════════════ */
+@media (max-width: 1050px) {
+
+    /* ── App wrapper stacks vertically so the sun strip
+       sits ABOVE the main content card ── */
+    .app-wrapper {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 20px;
+    }
+
+    /* ── Sun strip: real flex row containing both trackers ── */
+    #sun-strip {
+        display: flex;                 /* override display:contents */
+        width: 100%;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 16px;
+        /* Keep it above the main content card but below fixed layers */
+        z-index: 5;
+        position: relative;
+    }
+
+    /* ── Each individual tracker: column layout, auto width ── */
+    .sun-track-wrapper {
+        position: static;            /* no longer absolutely positioned */
+        transform: none;
+        width: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 0;            /* spacing handled by gap on #sun-strip */
+    }
+
+    /* Reset desktop left/right offsets */
+    .sun-track-wrapper.left,
+    .sun-track-wrapper.right {
+        left: unset;
+        right: unset;
+        top: unset;
+    }
+
+    /* Sunset wrapper visible again when forecast is open on this breakpoint */
+    .app-wrapper.forecast-open #sunset-wrapper {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0);
+    }
+
+    /* Arc size — compact for inline strip */
+    .sun-arc-box  { width: 100px; height: 60px; }
+    .track-arc    { width: 80px; height: 40px; left: 10px; }
+    .sun-pivot    { width: 80px; height: 80px; bottom: -40px; left: 10px; }
+    .mini-sun     { top: -8px; left: 32px; width: 16px; height: 16px; }
+
+    .half-width { width: 100%; }
+    
+    .cards-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+    }
+    
+    .forecast-card-wrapper {
+        width: 100%;
+        max-width: 500px;
+        height: 0;
+        transform: translateY(-40px) scale(0.95);
+        transition: height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    opacity 0.3s ease,
+                    transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .forecast-card-wrapper.open {
+        width: 100%;
+        height: auto;
+        max-height: 1600px;          /* increased to accommodate graph panel */
+        transform: translateY(0) scale(1);
+        margin-top: 25px;
+    }
+}
+
+/* ══════════════════════════════════════
+   BREAKPOINT 2: Mobile (≤ 768px)
+   Core mobile responsiveness lives here
+══════════════════════════════════════ */
+@media (max-width: 768px) {
+    .app-wrapper {
+        padding: 0 12px;
+        /* Remove any fixed widths that might cause overflow */
+        max-width: 100%;
+    }
+
+    .app-wrapper.forecast-open {
+        max-width: 100%;
+    }
+
+    /* Sun strip: tighter gap on small screens */
+    #sun-strip {
+        gap: 20px;
+        margin-bottom: 12px;
+        padding: 0 4px;
+    }
+
+    /* Arc dimensions: smaller on phone */
+    .sun-arc-box  { width: 80px; height: 50px; }
+    .track-arc    { width: 60px; height: 32px; left: 10px; }
+    .sun-pivot    { width: 60px; height: 60px; bottom: -30px; left: 10px; }
+    .mini-sun     { top: -7px; left: 22px; width: 14px; height: 14px; }
+    .track-label  { font-size: 0.6rem; }
+    .track-time   { font-size: 0.85rem; }
+
+    /* Cards fill full width */
+    .main-card-wrapper,
+    .forecast-card-wrapper,
+    .forecast-card-wrapper.open,
+    .forecast-card {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .forecast-card-wrapper.open {
+        margin-top: 16px;
+    }
+
+    .cards-row {
+        gap: 0;
+    }
+}
+
+/* ══════════════════════════════════════
+   BREAKPOINT 3: Very small phones (≤ 480px)
+══════════════════════════════════════ */
+@media (max-width: 480px) {
+    .app-wrapper {
+        padding: 0 8px;
+    }
+
+    #sun-strip {
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+
+    .sun-arc-box  { width: 70px; height: 44px; }
+    .track-arc    { width: 52px; height: 28px; left: 9px; }
+    .sun-pivot    { width: 52px; height: 52px; bottom: -26px; left: 9px; }
+    .mini-sun     { top: -6px; left: 19px; width: 12px; height: 12px; }
+    .track-time   { font-size: 0.8rem; }
+}

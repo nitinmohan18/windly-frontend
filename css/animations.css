@@ -1,0 +1,298 @@
+/* ══════════════════════════════════════
+   ANIMATIONS.CSS
+   Weather stage and all particle effects.
+   Performance notes:
+     - #weather-stage uses contain:strict so all child repaints
+       are isolated from the rest of the page.
+     - Individual particles use will-change:transform so the
+       browser can promote them to their own compositor layers.
+     - Mobile section at the bottom reduces GPU cost for weaker chips.
+══════════════════════════════════════ */
+
+/* The full-screen container that holds all weather particles.
+   contain:strict means nothing inside can affect layout outside. */
+#weather-stage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+    will-change: contents;
+    contain: strict;
+}
+
+/* ── Click Effects ───────────────────────────────────────
+   Spawned on user click. Cleaned up after 1s by JS. */
+.water-drop {
+    position: fixed;
+    width: 25px;
+    height: 25px;
+    background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(0,242,254,0.4) 100%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: drop-ripple 0.6s ease-out forwards;
+    pointer-events: none;
+    z-index: 10000;
+    will-change: transform, opacity;
+}
+
+.ice-crystal {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background: white;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    animation: ice-shatter 0.8s ease-out forwards;
+    pointer-events: none;
+    z-index: 10000;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    will-change: transform, opacity;
+}
+
+@keyframes drop-ripple {
+    0%   { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+}
+
+@keyframes ice-shatter {
+    0%   { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(2.5) rotate(90deg); opacity: 0; }
+}
+
+/* ── Rain Drops ──────────────────────────────────────────*/
+.rain-drop {
+    position: absolute;
+    background: rgba(255,255,255,0.6);
+    width: 2px;
+    animation: fall linear infinite;
+    will-change: transform;
+}
+/* Tilted variant for heavy/stormy rain */
+.rain-drop.tilted { animation: fall-tilted linear infinite; }
+
+/* ── Snow ────────────────────────────────────────────────*/
+.snowflake {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: snow-fall linear infinite;
+    will-change: transform;
+}
+
+/* ── Clouds ──────────────────────────────────────────────*/
+.cloud-bit {
+    position: absolute;
+    background: rgba(255,255,255,0.3);
+    filter: blur(25px);
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: drift linear infinite;
+    will-change: transform;
+}
+
+/* ── Wind Lines ──────────────────────────────────────────*/
+.wind-line {
+    position: absolute;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    height: 2px;
+    border-radius: 50%;
+    animation: blow linear infinite;
+    will-change: transform;
+}
+
+/* ── Lightning Flash (full-screen white overlay) ─────────*/
+#lightning-flash {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+#lightning-flash.flash-active { animation: lightning-flash 0.3s ease-out; }
+
+/* Individual SVG bolt element */
+.lightning-bolt {
+    position: absolute;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    opacity: 0;
+    z-index: 6;
+    animation: bolt-strike 0.5s ease-out;
+    will-change: opacity;
+}
+
+/* ── Sun Arc ─────────────────────────────────────────────
+   The sunrise/sunset arc tracker in the header area. */
+@keyframes riseArc { from { transform: rotate(-90deg); } to { transform: rotate(0deg); } }
+@keyframes setArc  { from { transform: rotate(0deg);  } to { transform: rotate(90deg); } }
+@keyframes glowPulsate {
+    from { box-shadow: 0 0 10px #ffeb3b; }
+    to   { box-shadow: 0 0 25px #ff9800; transform: scale(1.1); }
+}
+
+/* ── Base Keyframes ──────────────────────────────────────*/
+@keyframes lightning-flash {
+    0%   { opacity: 0; }
+    10%  { opacity: 0.8; }
+    20%  { opacity: 0; }
+    30%  { opacity: 0.5; }
+    100% { opacity: 0; }
+}
+
+@keyframes bolt-strike {
+    0%   { opacity: 0; }
+    10%  { opacity: 1; }
+    15%  { opacity: 0; }
+    20%  { opacity: 1; }
+    25%  { opacity: 0; }
+    30%  { opacity: 0.8; }
+    100% { opacity: 0; }
+}
+
+@keyframes pulse      { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+@keyframes fall        { to { transform: translateY(110vh); } }
+@keyframes fall-tilted {
+    from { transform: translateY(-10vh) translateX(0); }
+    to   { transform: translateY(110vh) translateX(-5vw); }
+}
+@keyframes drift       { from { transform: translateX(-30vw); } to { transform: translateX(120vw); } }
+@keyframes blow        { from { transform: translateX(-30vw); } to { transform: translateX(120vw); } }
+@keyframes snow-fall   {
+    0%   { transform: translateY(-10vh) translateX(0); }
+    50%  { transform: translateY(50vh)  translateX(25px); }
+    100% { transform: translateY(110vh) translateX(0); }
+}
+@keyframes popIn {
+    0%   { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Forecast row flip-in on render */
+@keyframes flipIn {
+    0%   { opacity: 0; transform: translateX(40px) scale(0.9) rotateX(25deg); }
+    60%  { opacity: 1; transform: translateX(-5px) scale(1.02) rotateX(0deg); }
+    100% { opacity: 1; transform: translateX(0) scale(1) rotateX(0deg); }
+}
+
+/* ── Extreme Heat Sun ────────────────────────────────────
+   Fixed in the top-right corner. Only visible on sunny-extreme theme. */
+#extreme-sun-container {
+    position: fixed;
+    top: 30px; right: 30px;
+    width: 200px; height: 200px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    z-index: 0;
+}
+
+body.sunny-extreme #extreme-sun-container { opacity: 1; }
+
+.blazing-sun { position: relative; width: 150%; height: 150%; animation: spin 15s linear infinite; }
+.sun-core {
+    position: absolute; top: 30%; left: 30%; width: 40%; height: 40%;
+    background: radial-gradient(circle, #fffdf2 0%, #ffeb3b 40%, #ff5722 100%);
+    border-radius: 50%;
+    animation: pulse-heat 1.5s infinite alternate;
+    will-change: transform, box-shadow;
+}
+.sun-rays {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-conic-gradient(from 0deg, transparent 0deg, rgba(255, 87, 34, 0.6) 15deg, transparent 30deg);
+    border-radius: 50%;
+    filter: blur(5px);
+}
+
+@keyframes pulse-heat {
+    0%   { transform: scale(1);   box-shadow: 0 0 40px #ff9800, 0 0 60px #ff5722; }
+    100% { transform: scale(1.2); box-shadow: 0 0 60px #ff5722, 0 0 120px #f44336; }
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* ── Shooting Stars ──────────────────────────────────────
+   Only visible in stargazer theme (clear night sky). */
+.shooting-star {
+    position: absolute;
+    width: 150px; height: 2px;
+    background: linear-gradient(-45deg, rgba(255, 255, 255, 1), rgba(0, 0, 255, 0));
+    border-radius: 999px;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1));
+    animation: shooting 3s ease-in-out infinite;
+    will-change: transform, opacity;
+}
+
+@keyframes shooting {
+    0%   { transform: translateX(0)      translateY(0)      rotate(-45deg) scaleX(0); opacity: 1; }
+    70%  { transform: translateX(-300px) translateY(300px)  rotate(-45deg) scaleX(1); opacity: 1; }
+    100% { transform: translateX(-400px) translateY(400px)  rotate(-45deg) scaleX(0); opacity: 0; }
+}
+
+/* ══════════════════════════════════════
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   Mid-range Android GPUs can struggle with heavy blur and lots of
+   compositor layers. These rules trade barely-visible quality for
+   significantly smoother frame rates on those devices.
+══════════════════════════════════════ */
+@media (max-width: 768px) {
+
+    /* Lighter card blur — still glass-like, much cheaper to render */
+    .weather-card {
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+
+    /* Smaller sun, mostly off-screen on mobile anyway */
+    #extreme-sun-container {
+        width: 130px;
+        height: 130px;
+        top: 15px;
+        right: 15px;
+    }
+
+    /* Reduce cloud blur — half the radius = quarter the fill cost */
+    .cloud-bit {
+        filter: blur(18px);
+    }
+
+    /* Hover states have no meaning on touch screens */
+    .fday-row:hover {
+        transform: none;
+        background: rgba(0, 0, 0, 0.2);
+        box-shadow: none;
+    }
+}
+
+/* ══════════════════════════════════════
+   REDUCED MOTION
+   Respects the OS-level "reduce motion" accessibility setting.
+   Particles are hidden; transitions are shortened, not removed.
+══════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .rain-drop,
+    .snowflake,
+    .cloud-bit,
+    .wind-line,
+    .shooting-star,
+    .blazing-sun,
+    .sun-core,
+    .mini-sun {
+        animation: none !important;
+    }
+
+    .fday-row {
+        animation: none !important;
+        opacity: 1 !important;
+    }
+
+    .forecast-card-wrapper {
+        transition: opacity 0.2s ease, height 0.2s ease !important;
+    }
+}

@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Windly">
+    <meta name="theme-color" content="#0f0c29">
+    <meta name="format-detection" content="telephone=no">
+    <title>Windly | Cinematic Weather</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+<style>
+  /* Critical layout — prevents left-flash before external CSS loads */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background: #0f0c29;
+    overflow-x: hidden;
+    padding: 40px 0;
+  }
+
+  .app-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 900px;
+    padding: 0 15px;
+    opacity: 0;
+  }
+</style>
+    <style>
+/* ════════════════════════════════════════════════════════════
+   ATMOSPHERIC INTELLIGENCE MODULE — Premium Cinematic Redesign
+   ─────────────────────────────────────────────────────────────
+   Refined dark analytical AI panel with:
+     • Deep atmospheric gradient (not flat black)
+     • Animated top-edge scan line + slow ambient light drift
+     • Premium spacing and clean typography hierarchy
+     • Enhanced gauge glow + conic depth
+     • Thinner 4 px factor bars with refined gradients
+     • Risk-aware background tints per severity level
+     • Futuristic feel — alive but not cluttered
+════════════════════════════════════════════════════════════ */
+
+/* ── 1. Shell ─────────────────────────────────────────── */
+#ai-prediction-module {
+    margin-top: 16px;
+    /* Atmospheric depth — layered radial + linear, not flat black */
+    background:
+        radial-gradient(ellipse at 18% 0%,   rgba(80, 38, 140, 0.22) 0%, transparent 52%),
+        radial-gradient(ellipse at 84% 100%, rgba(20, 55, 100, 0.18) 0%, transparent 52%),
+        linear-gradient(158deg,
+            rgba(22, 14, 50, 0.96) 0%,
+            rgba(14, 10, 36, 0.97) 55%,
+            rgba(10,  8, 28, 0.99) 100%);
+    border: 1px solid rgba(120, 68, 220, 0.28);
+    border-radius: 24px;
+    box-shadow:
+        0 0  0 1px rgba(120, 68, 220, 0.06),
+        0 18px 52px rgba(0, 0, 0, 0.52),
+        0  6px 20px rgba(0, 0, 0, 0.28),
+        inset 0  1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(30px) saturate(155%);
+    -webkit-backdrop-filter: blur(30px) saturate(155%);
+    color: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    z-index: 101;
+}
+
+/* Animated scan line sweeping along top edge */
+#ai-prediction-module::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -80%; right: auto;
+    width: 55%; height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(160,100,255,0.45) 28%,
+        rgba(0, 220, 255, 0.55) 60%,
+        transparent 100%);
+    animation: aiScanLine 5.5s ease-in-out infinite;
+    z-index: 10;
+    pointer-events: none;
+}
+@keyframes aiScanLine {
+    0%   { left: -80%; opacity: 0; }
+    5%   { opacity: 1; }
+    92%  { opacity: 0.85; }
+    100% { left: 145%; opacity: 0; }
+}
+
+/* Slow ambient light drift — very subtle, barely visible */
+#ai-prediction-module::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -85%;
+    width: 38%; height: 100%;
+    background: linear-gradient(108deg,
+        transparent 0%,
+        rgba(155, 120, 255, 0.022) 40%,
+        rgba(170, 140, 255, 0.028) 50%,
+        rgba(155, 120, 255, 0.022) 60%,
+        transparent 100%);
+    animation: aiAmbientDrift 13s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+@keyframes aiAmbientDrift {
+    0%,  18% { left: -85%; }
+    82%, 100% { left: 148%; }
+}
+
+/* ── 2. Header ────────────────────────────────────────── */
+.ai-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+    position: relative; z-index: 2;
+}
+.ai-header-left { display: flex; align-items: center; gap: 12px; }
+
+.ai-brain-icon {
+    font-size: 1.55rem !important;
+    color: #c8a0ff;
+    animation: brainGlow 3.2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+@keyframes brainGlow {
+    0%,100% {
+        text-shadow: 0 0 6px rgba(200,160,255,0.22),
+                     0 0 14px rgba(138,43,226,0.12);
+    }
+    50% {
+        text-shadow: 0 0 14px rgba(200,160,255,0.88),
+                     0 0 30px rgba(138,43,226,0.55),
+                     0 0 55px rgba(100,20,200,0.18);
+    }
+}
+.ai-title-block { display: flex; flex-direction: column; gap: 3px; }
+.ai-title {
+    font-size: 0.97rem; font-weight: 700;
+    letter-spacing: 0.2px; color: #fff; line-height: 1;
+}
+.ai-subtitle {
+    font-size: 0.57rem; font-weight: 600;
+    letter-spacing: 2.5px;
+    color: rgba(175, 138, 255, 0.58);
+    text-transform: uppercase;
+}
+.ai-live-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(48, 209, 88, 0.09);
+    border: 1px solid rgba(48, 209, 88, 0.26);
+    border-radius: 20px; padding: 5px 12px;
+    font-size: 0.64rem; font-weight: 700;
+    letter-spacing: 1.5px; color: #30d158;
+}
+.ai-live-dot {
+    width: 6px; height: 6px;
+    background: #30d158; border-radius: 50%;
+    animation: livePulse 2s ease-in-out infinite;
+    box-shadow: 0 0 5px #30d158;
+}
+@keyframes livePulse {
+    0%,100% { opacity: 1; transform: scale(1);    box-shadow: 0 0 5px #30d158; }
+    50%      { opacity: 0.4; transform: scale(0.72); box-shadow: 0 0 2px #30d158; }
+}
+
+/* ── 3. Analysis block (gauge + message) ─────────────── */
+.ai-analysis-section {
+    display: flex; align-items: flex-start;
+    gap: 18px; padding: 20px 20px 17px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative; z-index: 2;
+}
+
+/* SVG circular gauge */
+.ai-gauge-wrap {
+    position: relative; flex-shrink: 0;
+    width: 84px; height: 84px;
+}
+.ai-gauge-svg { transform: rotate(-90deg); width: 84px; height: 84px; }
+.ai-gauge-track {
+    fill: none;
+    stroke: rgba(255,255,255,0.06);
+    stroke-width: 5.5;
+}
+.ai-gauge-fill {
+    fill: none;
+    stroke-width: 5.5;
+    stroke-linecap: round;
+    stroke-dasharray: 207.3;
+    stroke-dashoffset: 207.3;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.2, 0.64, 1),
+                stroke 0.6s ease;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+.ai-gauge-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    line-height: 1;
+}
+.ai-pct-num {
+    font-size: 1.62rem; font-weight: 700;
+    letter-spacing: -2px; color: #fff;
+    text-shadow: 0 0 18px rgba(255,255,255,0.22);
+}
+.ai-pct-sym {
+    font-size: 0.54rem; opacity: 0.48;
+    font-weight: 600; margin-top: 2px;
+    letter-spacing: 0.5px; text-transform: uppercase;
+}
+
+/* Text content */
+.ai-msg-block {
+    flex: 1; display: flex; flex-direction: column;
+    gap: 7px; min-width: 0; padding-top: 2px;
+}
+.ai-risk-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 0.62rem; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    align-self: flex-start;
+    border: 1px solid transparent;
+    transition: all 0.5s ease;
+}
+.ai-risk-badge .material-icons { font-size: 0.68rem !important; }
+.ai-main-message {
+    font-size: 1.05rem; font-weight: 700;
+    line-height: 1.25; color: #fff; letter-spacing: 0.05px;
+}
+.ai-sub-message {
+    font-size: 0.69rem; opacity: 0.48;
+    font-weight: 400; line-height: 1.58; font-style: italic;
+}
+
+/* ── 4. Contributing Factors ──────────────────────────── */
+.ai-factors-section {
+    padding: 16px 20px 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative; z-index: 2;
+}
+.ai-section-label {
+    font-size: 0.57rem; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: rgba(175,138,255,0.48);
+    margin-bottom: 13px;
+}
+.ai-factors-grid { display: flex; flex-direction: column; gap: 9px; }
+.ai-factor-row {
+    display: grid;
+    grid-template-columns: 18px 68px 1fr 46px;
+    align-items: center; gap: 8px;
+}
+.ai-factor-icon {
+    font-size: 0.75rem !important; opacity: 0.52;
+    color: var(--primary); text-align: center;
+}
+.ai-factor-name {
+    font-size: 0.61rem; opacity: 0.50; font-weight: 500;
+    letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+}
+.ai-factor-track {
+    height: 4px;
+    background: rgba(255,255,255,0.055);
+    border-radius: 4px; overflow: hidden; position: relative;
+}
+.ai-factor-fill {
+    height: 100%; border-radius: 4px;
+    width: 0%;
+    transition: width 1.2s cubic-bezier(0.34, 1.1, 0.64, 1);
+    position: relative;
+}
+.ai-factor-fill::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg,
+        transparent 0%, rgba(255,255,255,0.28) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: factorShimmer 4s ease-in-out infinite;
+}
+@keyframes factorShimmer {
+    0%   { background-position: -200% 0; opacity: 0.45; }
+    50%  { background-position:  200% 0; opacity: 1; }
+    100% { background-position: -200% 0; opacity: 0.45; }
+}
+.ai-factor-val {
+    font-size: 0.69rem; font-weight: 700;
+    text-align: right; color: rgba(255,255,255,0.78);
+    white-space: nowrap; letter-spacing: 0.2px;
+}
+
+/* ── 5. Risk Spectrum Bar ─────────────────────────────── */
+.ai-spectrum-section {
+    padding: 14px 20px 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative; z-index: 2;
+}
+.ai-spectrum-track {
+    height: 8px; border-radius: 8px;
+    background: linear-gradient(90deg,
+        #22c55e 0%, #fbbf24 38%, #f97316 62%, #ef4444 100%);
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.38),
+                0 0 0 1px rgba(255,255,255,0.04);
+    overflow: visible; margin-bottom: 9px;
+}
+.ai-spectrum-marker {
+    position: absolute; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 15px; height: 15px;
+    background: #fff; border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.22),
+                0 2px 8px rgba(0,0,0,0.45),
+                0 0 10px rgba(255,255,255,0.12);
+    transition: left 1.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+    left: 0%; z-index: 2;
+}
+.ai-spectrum-marker::after {
+    content: ''; position: absolute; inset: 3px;
+    border-radius: 50%; background: #fff;
+    box-shadow: 0 0 8px rgba(255,255,255,0.9);
+}
+.ai-spectrum-labels {
+    display: flex; justify-content: space-between;
+    font-size: 0.55rem; opacity: 0.36;
+    font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase;
+}
+
+/* ── 6. Tomorrow's Snapshot ───────────────────────────── */
+.ai-tomorrow-section {
+    padding: 15px 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative; z-index: 2;
+}
+.ai-tomorrow-grid {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr 1fr;
+    align-items: center; gap: 9px;
+}
+.ai-tomorrow-icon img {
+    width: 40px; height: 40px;
+    filter: drop-shadow(0 2px 8px rgba(255,255,255,0.16));
+}
+.ai-tomorrow-stat {
+    display: flex; flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 13px; padding: 9px 6px; text-align: center;
+    box-shadow: inset 0  1px 0 rgba(255,255,255,0.07),
+                inset 0 -1px 0 rgba(0,0,0,0.18);
+    transition: transform 0.22s ease, background 0.22s ease;
+}
+.ai-tomorrow-stat:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.07);
+}
+.ai-tomorrow-stat-label {
+    font-size: 0.54rem; opacity: 0.44;
+    letter-spacing: 1px; text-transform: uppercase;
+    font-weight: 600; margin-bottom: 4px;
+}
+.ai-tomorrow-stat-val {
+    font-size: 0.90rem; font-weight: 700;
+    color: var(--primary); letter-spacing: 0.1px;
+}
+.ai-tomorrow-temp-block {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
+}
+.ai-tomorrow-high {
+    font-size: 1.08rem; font-weight: 700;
+    color: #ff8c50;
+    text-shadow: 0 0 12px rgba(255,120,50,0.30);
+}
+.ai-tomorrow-low { font-size: 0.78rem; opacity: 0.58; color: #a8d8ff; }
+
+/* ── 7. Footer ────────────────────────────────────────── */
+.ai-footer {
+    display: flex; align-items: center;
+    justify-content: center; gap: 6px;
+    padding: 10px 20px 11px;
+    font-size: 0.57rem; opacity: 0.28;
+    letter-spacing: 0.5px; color: #fff;
+    position: relative; z-index: 2;
+}
+.ai-footer .material-icons { font-size: 0.75rem !important; }
+
+/* ════════════════════════════════════════════════════════
+   8. RISK COLOUR THEMES — adaptive background tints
+   Each level subtly shifts the ambient radial gradient
+   so the card feels physically attuned to current risk.
+════════════════════════════════════════════════════════ */
+/* ── LOW ── */
+#ai-prediction-module[data-risk="low"] {
+    border-color: rgba(34, 197, 94, 0.28);
+    box-shadow: 0 0 0 1px rgba(34,197,94,0.06),
+                0 18px 52px rgba(0,0,0,0.52),
+                0 0 42px rgba(34,197,94,0.05),
+                inset 0 1px 0 rgba(255,255,255,0.08);
+    background:
+        radial-gradient(ellipse at 18% 0%,   rgba(18,110,55,0.22) 0%, transparent 52%),
+        radial-gradient(ellipse at 84% 100%, rgba(8, 40,72,0.14)  0%, transparent 52%),
+        linear-gradient(158deg, rgba(12,28,18,0.97) 0%, rgba(8,16,12,0.98) 55%, rgba(6,12,8,0.99) 100%);
+}
+#ai-prediction-module[data-risk="low"] .ai-gauge-fill    { stroke: #22c55e; filter: drop-shadow(0 0 5px rgba(34,197,94,0.65)); }
+#ai-prediction-module[data-risk="low"] .ai-risk-badge    { background: rgba(34,197,94,0.11); color: #4ade80; border-color: rgba(34,197,94,0.28); }
+#ai-prediction-module[data-risk="low"] .ai-brain-icon    { color: #4ade80; }
+#ai-prediction-module[data-risk="low"] .ai-subtitle      { color: rgba(134,239,172,0.60); }
+#ai-prediction-module[data-risk="low"] .ai-section-label { color: rgba(134,239,172,0.46); }
+#ai-prediction-module[data-risk="low"]::before           { background: linear-gradient(90deg, transparent, rgba(34,197,94,0.50), rgba(0,242,254,0.22), transparent); }
+
+/* ── MODERATE ── */
+#ai-prediction-module[data-risk="moderate"] {
+    border-color: rgba(251, 191, 36, 0.28);
+    box-shadow: 0 0 0 1px rgba(251,191,36,0.06),
+                0 18px 52px rgba(0,0,0,0.52),
+                0 0 42px rgba(251,191,36,0.04),
+                inset 0 1px 0 rgba(255,255,255,0.08);
+    background:
+        radial-gradient(ellipse at 18% 0%,   rgba(115,75,8,0.22)  0%, transparent 52%),
+        radial-gradient(ellipse at 84% 100%, rgba(45,25,5,0.14)   0%, transparent 52%),
+        linear-gradient(158deg, rgba(24,17,6,0.97) 0%, rgba(16,12,4,0.98) 55%, rgba(12,8,3,0.99) 100%);
+}
+#ai-prediction-module[data-risk="moderate"] .ai-gauge-fill    { stroke: #fbbf24; filter: drop-shadow(0 0 5px rgba(251,191,36,0.65)); }
+#ai-prediction-module[data-risk="moderate"] .ai-risk-badge    { background: rgba(251,191,36,0.11); color: #fcd34d; border-color: rgba(251,191,36,0.28); }
+#ai-prediction-module[data-risk="moderate"] .ai-brain-icon    { color: #fcd34d; }
+#ai-prediction-module[data-risk="moderate"] .ai-subtitle      { color: rgba(253,230,138,0.60); }
+#ai-prediction-module[data-risk="moderate"] .ai-section-label { color: rgba(253,230,138,0.46); }
+#ai-prediction-module[data-risk="moderate"]::before           { background: linear-gradient(90deg, transparent, rgba(251,191,36,0.52), rgba(249,115,22,0.22), transparent); }
+
+/* ── HIGH ── */
+#ai-prediction-module[data-risk="high"] {
+    border-color: rgba(249, 115, 22, 0.32);
+    box-shadow: 0 0 0 1px rgba(249,115,22,0.07),
+                0 18px 52px rgba(0,0,0,0.52),
+                0 0 42px rgba(249,115,22,0.06),
+                inset 0 1px 0 rgba(255,255,255,0.08);
+    background:
+        radial-gradient(ellipse at 18% 0%,   rgba(115,46,8,0.24)  0%, transparent 52%),
+        radial-gradient(ellipse at 84% 100%, rgba(55,18,4,0.15)   0%, transparent 52%),
+        linear-gradient(158deg, rgba(26,12,4,0.97) 0%, rgba(17,8,3,0.98) 55%, rgba(13,6,2,0.99) 100%);
+}
+#ai-prediction-module[data-risk="high"] .ai-gauge-fill    { stroke: #f97316; filter: drop-shadow(0 0 5px rgba(249,115,22,0.65)); }
+#ai-prediction-module[data-risk="high"] .ai-risk-badge    { background: rgba(249,115,22,0.11); color: #fb923c; border-color: rgba(249,115,22,0.32); }
+#ai-prediction-module[data-risk="high"] .ai-brain-icon    { color: #fb923c; }
+#ai-prediction-module[data-risk="high"] .ai-subtitle      { color: rgba(253,186,116,0.60); }
+#ai-prediction-module[data-risk="high"] .ai-section-label { color: rgba(253,186,116,0.46); }
+#ai-prediction-module[data-risk="high"]::before           { background: linear-gradient(90deg, transparent, rgba(249,115,22,0.58), rgba(239,68,68,0.22), transparent); }
+
+/* ── SEVERE ── */
+#ai-prediction-module[data-risk="severe"] {
+    border-color: rgba(239, 68, 68, 0.38);
+    box-shadow: 0 0 0 1px rgba(239,68,68,0.08),
+                0 18px 52px rgba(0,0,0,0.55),
+                0 0 42px rgba(239,68,68,0.07),
+                inset 0 1px 0 rgba(255,255,255,0.08);
+    background:
+        radial-gradient(ellipse at 18% 0%,   rgba(115,18,18,0.26) 0%, transparent 52%),
+        radial-gradient(ellipse at 84% 100%, rgba(55, 8, 8,0.17)  0%, transparent 52%),
+        linear-gradient(158deg, rgba(25,7,7,0.97) 0%, rgba(16,5,5,0.98) 55%, rgba(12,4,4,0.99) 100%);
+}
+#ai-prediction-module[data-risk="severe"] .ai-gauge-fill    { stroke: #ef4444; filter: drop-shadow(0 0 5px rgba(239,68,68,0.65)); }
+#ai-prediction-module[data-risk="severe"] .ai-risk-badge    { background: rgba(239,68,68,0.11); color: #f87171; border-color: rgba(239,68,68,0.38); }
+#ai-prediction-module[data-risk="severe"] .ai-brain-icon    { color: #f87171; }
+#ai-prediction-module[data-risk="severe"] .ai-subtitle      { color: rgba(252,165,165,0.60); }
+#ai-prediction-module[data-risk="severe"] .ai-section-label { color: rgba(252,165,165,0.46); }
+#ai-prediction-module[data-risk="severe"]::before           { background: linear-gradient(90deg, transparent, rgba(239,68,68,0.62), rgba(239,68,68,0.32), transparent); }
+
+/* Factor fill gradients per risk — refined, less saturated at origin */
+#ai-prediction-module[data-risk="low"]      .ai-factor-fill { background: linear-gradient(90deg, rgba(16,92,44,0.75), #22c55e); }
+#ai-prediction-module[data-risk="moderate"] .ai-factor-fill { background: linear-gradient(90deg, rgba(105,64,0,0.75), #fbbf24); }
+#ai-prediction-module[data-risk="high"]     .ai-factor-fill { background: linear-gradient(90deg, rgba(98,36,0,0.75),  #f97316); }
+#ai-prediction-module[data-risk="severe"]   .ai-factor-fill { background: linear-gradient(90deg, rgba(98,8,8,0.75),   #ef4444); }
+
+/* ── 9. Mobile adjustments ────────────────────────────── */
+@media (max-width: 480px) {
+    .ai-header            { padding: 15px 15px 12px; }
+    .ai-analysis-section  { gap: 14px; padding: 16px 15px 14px; }
+    .ai-gauge-wrap        { width: 72px; height: 72px; }
+    .ai-gauge-svg         { width: 72px; height: 72px; }
+    .ai-pct-num           { font-size: 1.38rem; }
+    .ai-main-message      { font-size: 0.93rem; }
+    .ai-factors-section,
+    .ai-spectrum-section,
+    .ai-tomorrow-section  { padding: 12px 15px 12px; }
+    .ai-footer            { padding: 9px 15px 10px; }
+    .ai-factor-row        { grid-template-columns: 16px 58px 1fr 42px; gap: 7px; }
+    .ai-tomorrow-grid     { grid-template-columns: auto 1fr 1fr 1fr; gap: 7px; }
+    .ai-title             { font-size: 0.90rem; }
+    .ai-tomorrow-stat     { padding: 8px 5px; }
+}
+@media (max-width: 360px) {
+    .ai-factor-name { display: none; }
+    .ai-factor-row  { grid-template-columns: 18px 1fr 40px; }
+}
+    </style>
+</head>
+<body>
+
+<div id="weather-stage"></div>
+<div id="lightning-flash"></div>
+
+<div class="app-wrapper">
+    <div id="extreme-sun-container">
+        <div class="blazing-sun"><div class="sun-rays"></div><div class="sun-core"></div></div>
+    </div>
+
+    <div id="sun-strip">
+        <div class="sun-track-wrapper left" id="sunrise-wrapper">
+            <div class="sun-arc-box">
+                <div class="track-arc"></div>
+                <div class="sun-pivot" id="rise-pivot"><div class="mini-sun"></div></div>
+            </div>
+            <p class="track-label">Sunrise</p>
+            <p class="track-time" id="sunrise-display">--:--</p>
+        </div>
+        <div class="sun-track-wrapper right" id="sunset-wrapper">
+            <div class="sun-arc-box">
+                <div class="track-arc"></div>
+                <div class="sun-pivot" id="set-pivot"><div class="mini-sun"></div></div>
+            </div>
+            <p class="track-label">Sunset</p>
+            <p class="track-time" id="sunset-display">--:--</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="city-dock" id="city-dock"></div>
+
+        <div class="cards-row" id="cards-layout">
+
+            <!-- ════ MAIN WEATHER CARD ════ -->
+            <div class="main-card-wrapper">
+                <div class="weather-card" id="main-card"
+                     data-tilt data-tilt-max="4" data-tilt-speed="400"
+                     data-tilt-glare="true" data-tilt-max-glare="0.15">
+
+                    <canvas id="fog-canvas"
+                        style="position:absolute;top:0;left:0;width:100%;height:100%;
+                               pointer-events:none;z-index:100;border-radius:inherit;"></canvas>
+
+                    <div class="card-header" style="position:relative;z-index:101;">
+                        <h2 class="logo">WINDLY</h2>
+                        <button id="sound-toggle" aria-label="Toggle ambient sound">
+                            <span class="material-icons" id="sound-icon">volume_off</span>
+                        </button>
+                    </div>
+
+                    <div class="search-box" style="position:relative;z-index:102;">
+                        <input type="text" id="city" placeholder="Enter city name..."
+                               autocomplete="off" autocorrect="off" autocapitalize="off"
+                               spellcheck="false" inputmode="search" enterkeyhint="search">
+                        <ul id="suggestions-box" class="suggestions-box" role="listbox"></ul>
+                        <button id="search-btn"   aria-label="Search"><span class="material-icons">search</span></button>
+                        <button id="mic-btn"      aria-label="Voice search"><span class="material-icons">mic</span></button>
+                        <button id="location-btn" aria-label="Use my location"><span class="material-icons">my_location</span></button>
+                    </div>
+
+                    <div class="hero-section" style="position:relative;z-index:101;">
+                        <div class="info-block">
+                            <h2 id="city-display">Loading...</h2>
+                            <p id="sub-location" class="sub-location"></p>
+                            <p id="live-time">--</p>
+                        </div>
+                        <div class="temp-block">
+                            <h1 id="temp">--°</h1>
+                            <p class="feels-like-row" id="feels-like-wrapper">
+                                Feels like <span id="feels-like">--°</span>
+                            </p>
+                            <button id="unit-toggle" aria-label="Switch temperature unit">Switch to °F</button>
+                        </div>
+                        <div class="info-block condition-info">
+                            <div class="condition-row">
+                                <img id="weather-icon" src="" alt="Weather condition icon"
+                                     loading="lazy" style="display:none;">
+                                <span id="description">Scanning skies...</span>
+                            </div>
+                            <div id="precip-info"></div>
+                        </div>
+                    </div>
+
+                    <div id="weather-msg" class="weather-msg"
+                         style="position:relative;z-index:101;"
+                         role="status" aria-live="polite"></div>
+
+                    <div class="dashboard-grid" style="position:relative;z-index:101;">
+                        <div class="panel full-width">
+                            <div class="panel-header">
+                                <span class="material-icons">schedule</span>
+                                <h4>24-Hour Forecast</h4>
+                            </div>
+                            <div id="hourly-forecast" class="hourly-forecast"
+                                 role="list" aria-label="24-hour forecast"></div>
+                        </div>
+                        <div class="panel half-width">
+                            <div class="stats-grid-mini">
+                                <div class="stat-item compact">
+                                    <span class="material-icons">air</span>
+                                    <div class="stat-info"><span class="label">AQI</span><p id="aqi">--</p></div>
+                                </div>
+                                <div class="stat-item compact">
+                                    <span class="material-icons">wb_sunny</span>
+                                    <div class="stat-info"><span class="label">UV Index</span><p id="uv-index">--</p></div>
+                                </div>
+                                <div class="stat-item compact">
+                                    <span class="material-icons">compress</span>
+                                    <div class="stat-info"><span class="label">Pressure</span><p id="pressure">--</p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel half-width">
+                            <div class="stats-grid-mini">
+                                <div class="stat-item compact">
+                                    <span class="material-icons">water_drop</span>
+                                    <div class="stat-info"><span class="label">Humidity</span><p id="humidity">--%</p></div>
+                                </div>
+                                <div class="stat-item compact">
+                                    <span class="material-icons">storm</span>
+                                    <div class="stat-info"><span class="label">Wind</span><p id="wind">-- km/h</p></div>
+                                </div>
+                                <div class="stat-item compact">
+                                    <span class="material-icons">dark_mode</span>
+                                    <div class="stat-info"><span class="label">Moon</span><p id="moon">--</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="forecast-toggle-btn"
+                            class="premium-btn"
+                            aria-expanded="false"
+                            aria-controls="forecast-wrapper"
+                            style="position:relative;z-index:101;
+                                   display:flex;flex-direction:column;align-items:center;
+                                   padding:14px 20px;gap:5px;height:auto;">
+                        <div style="display:flex;align-items:center;gap:9px;">
+                            <span class="material-icons" style="color:#d8a8ff;font-size:1.2rem;">auto_awesome</span>
+                            <span id="forecast-btn-label"
+                                  style="font-weight:700;font-size:1.05rem;color:#d8a8ff;letter-spacing:0.4px;">
+                                See Upcoming Forecasts
+                            </span>
+                            <span class="material-icons" id="forecast-btn-arrow">arrow_forward</span>
+                        </div>
+                        <span style="font-size:0.75rem;opacity:0.72;font-style:italic;
+                                     font-weight:400;text-transform:none;letter-spacing:0.2px;">
+                            See Tomorrow's Sky Today with AI
+                        </span>
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- ════ FORECAST CARD ════ -->
+            <div class="forecast-card-wrapper" id="forecast-wrapper" aria-hidden="true">
+                <div class="weather-card forecast-card" id="forecast-card"
+                     data-tilt data-tilt-max="2" data-tilt-speed="400"
+                     data-tilt-glare="true" data-tilt-max-glare="0.1">
+
+                    <div class="card-header" style="margin-bottom:12px;">
+                        <div class="forecast-title-row logo"
+                             style="font-size:1.1rem;display:flex;align-items:center;gap:8px;">
+                            <span class="material-icons">calendar_month</span>
+                            <h3 style="font-weight:400;letter-spacing:2px;">FORECAST OUTLOOK</h3>
+                        </div>
+                        <button id="close-forecast-btn" class="close-forecast-btn"
+                                title="Close Forecast" aria-label="Close forecast">
+                            <span class="material-icons">close</span>
+                        </button>
+                    </div>
+
+                    <div class="forecast-tabs" id="forecast-tabs" role="tablist">
+                        <button class="ftab ftab-active" data-tab="days"
+                                role="tab" aria-selected="true">
+                            <span class="material-icons">calendar_month</span>Forecast
+                        </button>
+                        <button class="ftab" data-tab="graph"
+                                role="tab" aria-selected="false">
+                            <span class="material-icons">show_chart</span>Graph
+                        </button>
+                    </div>
+
+                    <div class="forecast-panel fp-active" id="panel-days" role="tabpanel">
+                        <div id="forecast-days-container" class="forecast-days-container">
+                            <p class="forecast-placeholder">Loading outlook...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="graph-card-wrapper" id="graph-card-wrapper">
+            <div class="forecast-panel" id="panel-graph" role="tabpanel">
+                <div class="graph-card">
+                    <div class="graph-panel-header">
+                        <span class="material-icons">show_chart</span>
+                        <h4>Temperature &amp; Humidity Trend</h4>
+                    </div>
+                    <div id="graph-container"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     ATMOSPHERIC INTELLIGENCE MODULE
+     Moved into correct DOM position by ai-manager.js
+════════════════════════════════════════════════════ -->
+<div id="ai-prediction-module" data-risk="moderate">
+
+    <!-- Header -->
+    <div class="ai-header">
+        <div class="ai-header-left">
+            <span class="material-icons ai-brain-icon">psychology</span>
+            <div class="ai-title-block">
+                <div class="ai-title">Atmospheric Intelligence</div>
+                <div class="ai-subtitle">Tomorrow’s Rain Risk Analysis</div>
+            </div>
+        </div>
+        <div class="ai-live-badge">
+            <span class="ai-live-dot"></span>LIVE
+        </div>
+    </div>
+
+    <!-- Gauge + message -->
+    <div class="ai-analysis-section">
+        <div class="ai-gauge-wrap">
+            <svg class="ai-gauge-svg" viewBox="0 0 80 80">
+                <circle class="ai-gauge-track" cx="40" cy="40" r="33"/>
+                <circle class="ai-gauge-fill" id="ai-gauge-fill" cx="40" cy="40" r="33"/>
+            </svg>
+            <div class="ai-gauge-center">
+                <span class="ai-pct-num" id="ai-pct-num">--</span>
+                <span class="ai-pct-sym">%</span>
+            </div>
+        </div>
+
+        <div class="ai-msg-block">
+            <span class="ai-risk-badge" id="ai-risk-badge">
+                <span class="material-icons" style="font-size:0.65rem">circle</span>
+                <span id="ai-risk-label">Analysing</span>
+            </span>
+            <div class="ai-main-message" id="ai-result-display">
+                Calibrating sensors...
+            </div>
+            <div class="ai-sub-message" id="ai-sub-message"></div>
+        </div>
+    </div>
+
+    <!-- Contributing factors -->
+    <div class="ai-factors-section">
+        <div class="ai-section-label">Contributing Factors</div>
+        <div class="ai-factors-grid">
+
+            <div class="ai-factor-row">
+                <span class="material-icons ai-factor-icon">thermostat</span>
+                <span class="ai-factor-name">Temp</span>
+                <div class="ai-factor-track"><div class="ai-factor-fill" id="af-temp"></div></div>
+                <span class="ai-factor-val" id="af-temp-val">--</span>
+            </div>
+
+            <div class="ai-factor-row">
+                <span class="material-icons ai-factor-icon">water_drop</span>
+                <span class="ai-factor-name">Humidity</span>
+                <div class="ai-factor-track"><div class="ai-factor-fill" id="af-humidity"></div></div>
+                <span class="ai-factor-val" id="af-humidity-val">--</span>
+            </div>
+
+            <div class="ai-factor-row">
+                <span class="material-icons ai-factor-icon">compress</span>
+                <span class="ai-factor-name">Pressure</span>
+                <div class="ai-factor-track"><div class="ai-factor-fill" id="af-pressure"></div></div>
+                <span class="ai-factor-val" id="af-pressure-val">--</span>
+            </div>
+
+            <div class="ai-factor-row">
+                <span class="material-icons ai-factor-icon">air</span>
+                <span class="ai-factor-name">Wind</span>
+                <div class="ai-factor-track"><div class="ai-factor-fill" id="af-wind"></div></div>
+                <span class="ai-factor-val" id="af-wind-val">--</span>
+            </div>
+
+            <div class="ai-factor-row">
+                <span class="material-icons ai-factor-icon">cloud</span>
+                <span class="ai-factor-name">Cloud</span>
+                <div class="ai-factor-track"><div class="ai-factor-fill" id="af-cloud"></div></div>
+                <span class="ai-factor-val" id="af-cloud-val">--</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Risk spectrum bar -->
+    <div class="ai-spectrum-section">
+        <div class="ai-spectrum-track">
+            <div class="ai-spectrum-marker" id="ai-spectrum-marker"></div>
+        </div>
+        <div class="ai-spectrum-labels">
+            <span>No Rain</span>
+            <span>Possible</span>
+            <span>Likely</span>
+            <span>Certain</span>
+        </div>
+    </div>
+
+    <!-- Tomorrow's snapshot -->
+    <div class="ai-tomorrow-section">
+        <div class="ai-section-label">Tomorrow's Snapshot</div>
+        <div class="ai-tomorrow-grid">
+            <div class="ai-tomorrow-icon">
+                <img id="ai-tomorrow-icon" src="" alt="Tomorrow's weather" loading="lazy"
+                     style="width:38px;height:38px;filter:drop-shadow(0 0 6px rgba(255,255,255,0.2))">
+            </div>
+            <div class="ai-tomorrow-stat">
+                <span class="ai-tomorrow-stat-label">Temp</span>
+                <div class="ai-tomorrow-temp-block">
+                    <span class="ai-tomorrow-high" id="ai-tmr-high">--</span>
+                    <span class="ai-tomorrow-low"  id="ai-tmr-low">--</span>
+                </div>
+            </div>
+            <div class="ai-tomorrow-stat">
+                <span class="ai-tomorrow-stat-label">Rain</span>
+                <span class="ai-tomorrow-stat-val" id="ai-tmr-rain">--%</span>
+            </div>
+            <div class="ai-tomorrow-stat">
+                <span class="ai-tomorrow-stat-label">Wind</span>
+                <span class="ai-tomorrow-stat-val" id="ai-tmr-wind">--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="ai-footer">
+        <span class="material-icons">memory</span>
+        Random Forest · 5 Atmospheric Features · Sigmoid Calibration
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+<script type="module" src="js/main.js"></script>
+<script type="module" src="js/ai-manager.js"></script>
+
+<script>
+/* ── Graph Card Pendulum Sway — desktop only ──────────────
+   When the mouse moves over the hanging graph card, it
+   sways gently as if pulled on its ropes. Motion is lerp-
+   smoothed (eased) and springs back to centre on leave.
+   Completely skipped on touch devices and screens ≤ 768 px.
+   The CSS pendulum-swing animation is allowed to finish
+   before sway takes over so there's no jarring conflict.
+─────────────────────────────────────────────────────────── */
+(function () {
+    if ('ontouchstart' in window) return; // skip all touch devices
+
+    function init() {
+        const wrapper = document.getElementById('graph-card-wrapper');
+        if (!wrapper) return;
+
+        let rafId     = null;
+        let curZ = 0, curX = 0;
+        let tgtZ = 0, tgtX = 0;
+        let hovering  = false;
+        let swayReady = false;
+
+        // Enable sway after the pendulum CSS animation finishes
+        wrapper.addEventListener('animationend', function onEnd() {
+            swayReady = true;
+            wrapper.removeEventListener('animationend', onEnd);
+        });
+
+        // Fallback: if the card is shown but animationend never fires,
+        // unlock sway after 5.2 s (pendulum is 4.5 s + buffer)
+        new MutationObserver(function (_, obs) {
+            if (wrapper.classList.contains('show')) {
+                obs.disconnect();
+                setTimeout(function () { swayReady = true; }, 5200);
+            }
+        }).observe(wrapper, { attributes: true, attributeFilter: ['class'] });
+
+        function tick() {
+            // Lerp toward target — 0.065 gives a buttery spring feel
+            curZ += (tgtZ - curZ) * 0.065;
+            curX += (tgtX - curX) * 0.065;
+
+            const atRest = !hovering &&
+                           Math.abs(curZ) < 0.004 &&
+                           Math.abs(curX) < 0.004;
+
+            if (atRest) {
+                wrapper.style.transform = '';
+                rafId = null;
+                return;
+            }
+
+            wrapper.style.transform =
+                'rotateZ(' + curZ.toFixed(4) + 'deg) ' +
+                'rotateX(' + curX.toFixed(4) + 'deg)';
+
+            rafId = requestAnimationFrame(tick);
+        }
+
+        wrapper.addEventListener('mousemove', function (e) {
+            if (window.innerWidth <= 768 || !swayReady) return;
+
+            // Stop CSS animation so JS transform takes full control
+            wrapper.style.animation = 'none';
+
+            var r  = wrapper.getBoundingClientRect();
+            var cx = r.left + r.width  / 2;
+            // Sway pivot near the rope attachment point (top 8%)
+            var cy = r.top  + r.height * 0.08;
+
+            tgtZ =  ((e.clientX - cx) / (r.width  / 2)) * 1.6; // ±1.6°
+            tgtX =  ((cy - e.clientY) / (r.height / 2)) * 0.7; // ±0.7°
+            hovering = true;
+
+            if (!rafId) rafId = requestAnimationFrame(tick);
+        });
+
+        wrapper.addEventListener('mouseleave', function () {
+            hovering = false;
+            tgtZ = 0;
+            tgtX = 0;
+            if (!rafId) rafId = requestAnimationFrame(tick);
+        });
+    }
+
+    // Works whether DOM is ready or not
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+:root {
+    --primary: #00f2fe;
+    --bg-dark: #0f0c29;
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif; 
+}
+
+body {
+    background: var(--bg-dark); 
+    min-height: 100vh; 
+    display: flex; 
+    justify-content: center; 
+    align-items: flex-start;
+    color: white; 
+    transition: background 1.5s ease; 
+    overflow-x: hidden; 
+    overflow-y: auto; 
+    padding: 40px 0;
+}
