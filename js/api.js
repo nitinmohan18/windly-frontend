@@ -200,14 +200,36 @@ function _setAIOffline() {
 }
 
 // ── Weather Data Fetch ────────────────────────────────────
-// Main entry point for getting weather data. Hits our FastAPI proxy
-// which caches results and keeps the WeatherAPI key off the client.
+// Main entry point for fetching weather. Hits our FastAPI proxy which
+// caches results and keeps the WeatherAPI key off the client.
+//
+// Cold-start / slow connection handling:
+//   - Render's free tier sleeps after ~10 min of inactivity. First request
+//     after sleep can take 30–40 seconds, which looks broken to the user.
+//   - We give the server 50 seconds before aborting.
+//   - After 7 seconds with no response we show a calm "taking longer than
+//     usual" message — intentionally neutral so it covers BOTH a cold-start
+//     server AND a slow mobile connection without misleading the user.
+//   - If the response arrives before 7s the timer is cancelled and the
+//     message never appears (server was warm / connection was fast).
+//   - On success updateUI() overwrites city-display and description with
+//     real weather data, so the waiting message disappears automatically.
 export async function fetchData(q) {
     if (!q || !q.toString().trim()) return;
     setLoadingState();
 
     const controller = new AbortController();
-    const timeoutId  = setTimeout(() => controller.abort(), 8000);
+
+    // Hard limit of 50s — gives worst-case cold starts enough runway
+    const timeoutId = setTimeout(() => controller.abort(), 50000);
+
+    // After 7s with no response, show a neutral "please wait" notice.
+    // Neutral wording covers both cold-start AND slow mobile data equally —
+    // we cannot tell from the client which one it is, so we don't guess.
+    const warmingTimer = setTimeout(() => {
+        _setText('city-display', 'Please Wait…');
+        _setText('description',  '⏳ Taking longer than usual. This can happen on the first load or on a slow connection — please hang tight.');
+    }, 7000);
 
     try {
         const query    = encodeURIComponent(q.toString().trim());
@@ -215,10 +237,20 @@ export async function fetchData(q) {
             `${CONFIG.BASE_URL}/weather/forecast?q=${query}`,
             { signal: controller.signal }
         );
+
+        // Server responded — kill both timers immediately.
+        // Calling clearTimeout on an already-fired timer is safe (no-op).
         clearTimeout(timeoutId);
+        clearTimeout(warmingTimer);
+
         const data = await response.json();
+
+        // Non-2xx response means the city wasn't found or the API returned
+        // a structured error — throw so the catch block handles the message.
         if (!response.ok) throw new Error(data.error?.message || 'City not found.');
 
+        // updateUI() writes the city name and conditions into city-display
+        // and description, naturally replacing any "please wait" message.
         appState.cache = data;
         updateHistory(data.location.name, fetchData);
         updateUI(data);
@@ -228,7 +260,7 @@ export async function fetchData(q) {
 
         const tomorrow = data.forecast.forecastday[1] ?? data.forecast.forecastday[0];
 
-        // Run AI prediction using tomorrow's conditions
+        // Run AI prediction using tomorrow's forecast conditions
         getAIPrediction(
             tomorrow.day.avgtemp_c,
             tomorrow.day.avghumidity,
@@ -239,11 +271,32 @@ export async function fetchData(q) {
         );
 
     } catch (e) {
+        // Clean up both timers on every error path — clearTimeout is always
+        // safe to call even if a timer already fired or was never set.
         clearTimeout(timeoutId);
-        let errorMsg = '📍 Location not found.', locationMsg = 'Invalid Location';
-        if (!navigator.onLine)           { errorMsg = '📶 No internet connection.'; locationMsg = 'Network Error'; }
-        else if (e.name === 'AbortError'){ errorMsg = '⏱ Request timed out.';       locationMsg = 'Timeout'; }
-        else if (e.message)              { errorMsg = e.message; }
+        clearTimeout(warmingTimer);
+
+        let errorMsg    = '📍 Location not found. Please check the city name and try again.';
+        let locationMsg = 'Not Found';
+
+        if (!navigator.onLine) {
+            // Device has no network connectivity at all
+            errorMsg    = '📶 No internet connection. Please check your Wi-Fi or mobile data and try again.';
+            locationMsg = 'No Internet';
+
+        } else if (e.name === 'AbortError') {
+            // Our 50s timer fired — the server never responded in time.
+            // This almost always means the server finished waking up during
+            // the wait, so a second search will succeed instantly.
+            errorMsg    = '🔄 Connection timed out. The server should be ready now — please search your city once more.';
+            locationMsg = 'Try Again';
+
+        } else if (e.message) {
+            // Covers wrong city name (API error message) and any other
+            // unexpected fetch / JSON parse errors.
+            errorMsg = e.message;
+        }
+
         _setText('description',  errorMsg);
         _setText('city-display', locationMsg);
     }
