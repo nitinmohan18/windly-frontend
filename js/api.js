@@ -203,34 +203,42 @@ function _setAIOffline() {
 // Main entry point for fetching weather. Hits our FastAPI proxy which
 // caches results and keeps the WeatherAPI key off the client.
 //
-// Cold-start / slow connection handling:
-//   - Render's free tier sleeps after ~10 min of inactivity. First request
-//     after sleep can take 30–40 seconds, which looks broken to the user.
-//   - We give the server 50 seconds before aborting.
-//   - After 7 seconds with no response we show a calm "taking longer than
-//     usual" message — intentionally neutral so it covers BOTH a cold-start
-//     server AND a slow mobile connection without misleading the user.
-//   - If the response arrives before 7s the timer is cancelled and the
-//     message never appears (server was warm / connection was fast).
-//   - On success updateUI() overwrites city-display and description with
-//     real weather data, so the waiting message disappears automatically.
+// IMPORTANT — two separate try/catch blocks on purpose:
+//
+//   Block 1 (network): handles fetch failures, timeouts, bad city names,
+//   and non-2xx responses. Shows user-facing error messages on failure.
+//
+//   Block 2 (rendering): wraps all UI update calls. Some locations return
+//   weather data that is missing optional fields (e.g. moon_phase for
+//   certain regions). Without this separation, a crash inside updateUI()
+//   would bubble up to the network catch and incorrectly show
+//   "Invalid Location" even though the fetch fully succeeded.
+//   Rendering errors are logged to the console only — the user still
+//   sees whatever parts of the UI rendered successfully.
+//
+// Cold-start handling:
+//   Render's free tier sleeps after ~10 min of inactivity. First request
+//   after sleep can take 30-40 seconds. We give it 50s before aborting,
+//   and show a calm waiting message after 7s so the user knows to hang tight.
 export async function fetchData(q) {
     if (!q || !q.toString().trim()) return;
     setLoadingState();
 
     const controller = new AbortController();
 
-    // Hard limit of 50s — gives worst-case cold starts enough runway
+    // Hard limit of 50s — covers worst-case cold starts on Render free tier
     const timeoutId = setTimeout(() => controller.abort(), 50000);
 
-    // After 7s with no response, show a neutral "please wait" notice.
-    // Neutral wording covers both cold-start AND slow mobile data equally —
-    // we cannot tell from the client which one it is, so we don't guess.
+    // After 7s with no response, show a neutral waiting notice.
+    // Neutral wording covers both a cold-starting server AND a slow mobile
+    // connection — we can't tell which from the client side, so we don't guess.
     const warmingTimer = setTimeout(() => {
         _setText('city-display', 'Please Wait…');
         _setText('description',  '⏳ Taking longer than usual. This can happen on the first load or on a slow connection — please hang tight.');
     }, 7000);
 
+    // ── Block 1: Network / fetch errors ──────────────────
+    let data;
     try {
         const query    = encodeURIComponent(q.toString().trim());
         const response = await fetch(
@@ -238,41 +246,18 @@ export async function fetchData(q) {
             { signal: controller.signal }
         );
 
-        // Server responded — kill both timers immediately.
-        // Calling clearTimeout on an already-fired timer is safe (no-op).
+        // Server responded — cancel both timers.
+        // clearTimeout on an already-fired timer is safe (no-op).
         clearTimeout(timeoutId);
         clearTimeout(warmingTimer);
 
-        const data = await response.json();
+        data = await response.json();
 
-        // Non-2xx response means the city wasn't found or the API returned
-        // a structured error — throw so the catch block handles the message.
+        // Non-2xx means wrong city name or a structured API error
         if (!response.ok) throw new Error(data.error?.message || 'City not found.');
 
-        // updateUI() writes the city name and conditions into city-display
-        // and description, naturally replacing any "please wait" message.
-        appState.cache = data;
-        updateHistory(data.location.name, fetchData);
-        updateUI(data);
-        renderHourlyForecast(data);
-        renderForecastCard(data);
-        manageAnimations(data);
-
-        const tomorrow = data.forecast.forecastday[1] ?? data.forecast.forecastday[0];
-
-        // Run AI prediction using tomorrow's forecast conditions
-        getAIPrediction(
-            tomorrow.day.avgtemp_c,
-            tomorrow.day.avghumidity,
-            tomorrow.day.maxwind_kph,
-            data.current.pressure_mb,
-            tomorrow.day.daily_chance_of_rain ?? tomorrow.day.cloud ?? 50,
-            tomorrow,
-        );
-
     } catch (e) {
-        // Clean up both timers on every error path — clearTimeout is always
-        // safe to call even if a timer already fired or was never set.
+        // Clean up timers on every error path
         clearTimeout(timeoutId);
         clearTimeout(warmingTimer);
 
@@ -285,21 +270,53 @@ export async function fetchData(q) {
             locationMsg = 'No Internet';
 
         } else if (e.name === 'AbortError') {
-            // Our 50s timer fired — the server never responded in time.
-            // This almost always means the server finished waking up during
-            // the wait, so a second search will succeed instantly.
+            // 50s timeout fired — server never responded in time.
+            // Almost always means the server finished waking up during the
+            // wait, so a second search will succeed instantly.
             errorMsg    = '🔄 Connection timed out. The server should be ready now — please search your city once more.';
             locationMsg = 'Try Again';
 
         } else if (e.message) {
-            // Covers wrong city name (API error message) and any other
-            // unexpected fetch / JSON parse errors.
+            // Covers wrong city name (WeatherAPI error) and unexpected errors
             errorMsg = e.message;
         }
 
         _setText('description',  errorMsg);
         _setText('city-display', locationMsg);
+        return; // stop here — no data to render
     }
+
+    // ── Block 2: UI rendering errors ─────────────────────
+    // The fetch succeeded and data is valid. Render everything.
+    // Each call is guarded individually so one broken field (e.g. a missing
+    // moon_phase for some locations) cannot crash the others or make the
+    // app show "Invalid Location" when the city was found perfectly fine.
+    appState.cache = data;
+    updateHistory(data.location.name, fetchData);
+
+    try { updateUI(data); }
+    catch (err) { console.warn('updateUI error (non-critical):', err.message); }
+
+    try { renderHourlyForecast(data); }
+    catch (err) { console.warn('renderHourlyForecast error (non-critical):', err.message); }
+
+    try { renderForecastCard(data); }
+    catch (err) { console.warn('renderForecastCard error (non-critical):', err.message); }
+
+    try { manageAnimations(data); }
+    catch (err) { console.warn('manageAnimations error (non-critical):', err.message); }
+
+    const tomorrow = data.forecast.forecastday[1] ?? data.forecast.forecastday[0];
+
+    // Run AI prediction using tomorrow's forecast conditions
+    getAIPrediction(
+        tomorrow.day.avgtemp_c,
+        tomorrow.day.avghumidity,
+        tomorrow.day.maxwind_kph,
+        data.current.pressure_mb,
+        tomorrow.day.daily_chance_of_rain ?? tomorrow.day.cloud ?? 50,
+        tomorrow,
+    );
 }
 
 // ── City Autocomplete ─────────────────────────────────────

@@ -134,10 +134,13 @@ export function updateUI(data) {
     set('pressure',  current.pressure_mb + ' mb');
 
     if (data.forecast?.forecastday?.length > 0) {
-        const astro = data.forecast.forecastday[0].astro;
-        set('moon',            astro.moon_phase);
-        set('sunrise-display', astro.sunrise);
-        set('sunset-display',  astro.sunset);
+        // Some locations (certain Australian cities, etc.) return forecastday
+        // data without an astro block — guard against that so the rest of the
+        // UI still renders normally and the moon field just shows '--'.
+        const astro = data.forecast.forecastday[0].astro || {};
+        set('moon',            astro.moon_phase || '--');
+        set('sunrise-display', astro.sunrise    || '--');
+        set('sunset-display',  astro.sunset     || '--');
     }
 
     triggerSunAnimation();
@@ -338,22 +341,23 @@ export function renderForecastCard(data) {
         }
         hourlyHtml += `</div>`;
 
-        // Sunrise / sunset row
-        const astro     = dayData.astro;
+        // Sunrise / sunset row — use empty object fallback so locations that
+        // don't return an astro block show '--' instead of crashing the render
+        const astro     = dayData.astro || {};
         const astroHtml = `
             <div class="detail-astro" aria-label="Sunrise and sunset times">
                 <div class="detail-astro-item">
                     <span class="material-icons" style="color:#FFD700;" aria-hidden="true">wb_twilight</span>
                     <div>
                         <span class="detail-astro-label">Sunrise</span>
-                        <span class="detail-astro-val">${astro.sunrise}</span>
+                        <span class="detail-astro-val">${astro.sunrise || '--'}</span>
                     </div>
                 </div>
                 <div class="detail-astro-item">
                     <span class="material-icons" style="color:#FF8C00;" aria-hidden="true">nights_stay</span>
                     <div>
                         <span class="detail-astro-label">Sunset</span>
-                        <span class="detail-astro-val">${astro.sunset}</span>
+                        <span class="detail-astro-val">${astro.sunset || '--'}</span>
                     </div>
                 </div>
             </div>`;

@@ -163,17 +163,27 @@ function toggleUnit() {
 }
 
 // ── Voice Search ──────────────────────────────────────────
+// Works on Chrome/Firefox (Android + desktop) and Safari iOS 14.5+ over HTTPS.
+// iOS requires: HTTPS (Vercel/Render satisfies this), a direct user gesture
+// (button tap satisfies this), and explicit lang + separated event handlers.
 let activeRecognition = null;
 
 function startVoiceSearch() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { alert('Voice search is not supported in this browser.'); return; }
+    if (!SR) {
+        // Truly unsupported — older iOS or non-Chromium Android browsers.
+        // Point iOS users to the keyboard dictation button as a fallback.
+        alert('Voice search is not supported in this browser.\n\nOn iPhone/iPad, tap the 🎤 button on your keyboard to dictate a city name instead.');
+        return;
+    }
 
     const btn = document.getElementById('mic-btn');
 
-    // Tapping the mic button again cancels an active recording
+    // Tapping the mic button again while recording cancels it cleanly
     if (activeRecognition) {
-        activeRecognition.onend = activeRecognition.onerror = activeRecognition.onresult = null;
+        activeRecognition.onresult = null;
+        activeRecognition.onerror  = null;
+        activeRecognition.onend    = null;
         activeRecognition.abort();
         activeRecognition = null;
         btn?.classList.remove('recording', 'listening');
@@ -182,22 +192,61 @@ function startVoiceSearch() {
 
     if (appState.soundEnabled) { ding.currentTime = 0; ding.play().catch(() => {}); }
 
-    const rec     = new SR();
+    const rec = new SR();
+
+    // iOS Safari requires lang to be set explicitly — without it recognition
+    // can silently fail or return no results on some devices
+    rec.lang            = navigator.language || 'en-US';
+    rec.continuous      = false;   // stop after first phrase (correct for search)
+    rec.interimResults  = false;   // we only want the final result
+    rec.maxAlternatives = 1;
+
     activeRecognition = rec;
     btn?.classList.add('recording', 'listening');
-    rec.start();
+
+    // Separate handlers — iOS fires onerror and onend in a different order
+    // than Chrome, so sharing one handler causes the button to get stuck
 
     rec.onresult = e => {
-        fetchData(e.results[0][0].transcript);
+        const transcript = e.results[0][0].transcript.trim();
+        if (transcript) fetchData(transcript);
         btn?.classList.remove('recording', 'listening');
         activeRecognition = null;
     };
-    rec.onerror = rec.onend = () => {
+
+    rec.onerror = e => {
+        btn?.classList.remove('recording', 'listening');
+        if (activeRecognition === rec) activeRecognition = null;
+
+        // Give the user a clear reason rather than silently failing
+        if (e.error === 'not-allowed') {
+            alert('Microphone access was denied.\n\nGo to your browser settings, allow microphone permission for this site, then try again.');
+        } else if (e.error === 'audio-capture') {
+            alert('No microphone was found on your device.');
+        }
+        // 'no-speech' is ignored — very common on iOS when the user hesitates.
+        // The button is already cleaned up above so nothing gets stuck.
+    };
+
+    rec.onend = () => {
+        // Always clean up the button when recognition ends for any reason.
+        // This fires after onresult too — classList.remove is safe to call twice.
         btn?.classList.remove('recording', 'listening');
         if (activeRecognition === rec) activeRecognition = null;
     };
-}
 
+    // Wrap start() in try/catch — iOS throws a real DOMException if the mic
+    // permission was previously denied and the browser cached that decision
+    try {
+        rec.start();
+    } catch (err) {
+        btn?.classList.remove('recording', 'listening');
+        activeRecognition = null;
+        if (err.name === 'NotAllowedError') {
+            alert('Microphone access was denied.\n\nGo to your browser settings, allow microphone permission for this site, then try again.');
+        }
+    }
+}
 // ── GPS Location ──────────────────────────────────────────
 function fetchCurrentLocation() {
     if (!navigator.geolocation) { alert('Geolocation is not supported by your browser.'); return; }
