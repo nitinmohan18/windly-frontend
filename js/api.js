@@ -292,6 +292,11 @@ export async function fetchData(q) {
     // moon_phase for some locations) cannot crash the others or make the
     // app show "Invalid Location" when the city was found perfectly fine.
     appState.cache = data;
+    if (!data.current || !data.current.temp_c || !data.forecast?.forecastday?.length) {
+            _setText('city-display', 'Service Unavailable');
+            _setText('description', '🌤️ Our weather service is temporarily unavailable. This is not an issue with the app — please try again in a few minutes!.');
+            return;
+        }
     updateHistory(data.location.name, fetchData);
 
     try { updateUI(data); }
