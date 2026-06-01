@@ -128,6 +128,7 @@ export function triggerLightningStrike() {
     stage.appendChild(bolt);
 
     setTimeout(() => { if (bolt.parentNode) bolt.remove(); }, 500);
+    clearTimeout(appState.stormTimeout);
     appState.stormTimeout = setTimeout(triggerLightningStrike, Math.random() * 7000 + 3000);
 }
 
@@ -540,6 +541,7 @@ export function manageAnimations(data) {
     handleInteractiveCanvas(isSnowing, isRaining, isHeavy);
 
     if (isThunder || (isRaining && isHeavy)) {
+        clearTimeout(appState.stormTimeout);
         appState.stormTimeout = setTimeout(triggerLightningStrike, 1500);
     }
 

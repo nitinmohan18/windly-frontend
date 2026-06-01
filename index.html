@@ -27,7 +27,7 @@
 <meta name="twitter:title" content="Windly | AI-Powered Weather Intelligence">
 <meta name="twitter:description" content="Real-time weather forecasting, atmospheric intelligence, AI rain prediction, and immersive weather visualization.">
 <meta name="twitter:image" content="https://windly-weather.vercel.app/images/windly-social-preview.png">
-    <title>Windly | AI Weather Forecast, Atmospheric Intelligence & Real-Time Weather Dashboard</title>
+    <title>Windly | AI Weather Forecast & Atmospheric Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -101,6 +101,7 @@ html { background: #0f0c29; overscroll-behavior: none; }
     opacity: 0;
     transform: translateY(15px);
     transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    animation-play-state: paused;
     position: relative;
     z-index: 101;
 }
@@ -556,7 +557,13 @@ html { background: #0f0c29; overscroll-behavior: none; }
     .ai-tomorrow-stat     { padding: 8px 5px; }
 }
 @media (max-width: 360px) {
-    .ai-factor-name { display: none; }
+    .ai-factor-name {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+    }
     .ai-factor-row  { grid-template-columns: 18px 1fr 40px; }
 }
     </style>

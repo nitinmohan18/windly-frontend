@@ -68,6 +68,7 @@ export async function getAIPrediction(temp, humidity, wind, pressure, cloud = 50
 function _updateAIModule(pct, riskKey, riskLabel, mainMsg, subMsg, inputs, tomorrowDay) {
     const mod = document.getElementById('ai-prediction-module');
     if (!mod) return;
+    mod.style.animationPlayState = 'running';
 
     // Risk theme (drives all color variables via CSS attribute selector)
     mod.setAttribute('data-risk', riskKey);
