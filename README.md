@@ -2,7 +2,7 @@
 
 > *A cinematic, AI-powered weather experience built for the modern web.*
 
-**Live Demo:** [your-windly-weather.vercel.app](https://windly-weather.vercel.app) &nbsp;|&nbsp; **Backend:** [windly-backend](https://github.com/nitinmohan18/windly-backend) &nbsp;|&nbsp; **Status:** ![Deployed](https://img.shields.io/badge/deployed-live-brightgreen) ![Vanilla JS](https://img.shields.io/badge/vanilla-JS-yellow) ![No Build Step](https://img.shields.io/badge/build%20step-none-blue)
+**Live Demo:** [windly-weather.vercel.app](https://windly-weather.vercel.app) &nbsp;|&nbsp; **Backend:** [windly-backend](https://github.com/nitinmohan18/windly-backend) &nbsp;|&nbsp; **Status:** ![Deployed](https://img.shields.io/badge/deployed-live-brightgreen) ![Vanilla JS](https://img.shields.io/badge/vanilla-JS-yellow) ![No Build Step](https://img.shields.io/badge/build%20step-none-blue)
 
 ---
 
