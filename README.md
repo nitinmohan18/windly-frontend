@@ -281,4 +281,4 @@ MIT — fork it, extend it, make it your own.
 
 ---
 
-<p align="center"><i>Built with obsessive attention to detail.<br>Feel the Weather Breathe.</i></p>
+<p align="center"><i>Built with obsessive attention to detail.<br>Feel the Weather .</i></p>
