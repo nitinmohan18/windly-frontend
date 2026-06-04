@@ -319,7 +319,7 @@ export async function fetchData(q) {
         tomorrow.day.avgtemp_c,
         tomorrow.day.avghumidity,
         tomorrow.day.maxwind_kph,
-        data.current.pressure_mb,
+        data.current.pressure_mb ?? 1013,
         tomorrow.day.daily_chance_of_rain ?? tomorrow.day.cloud ?? 50,
         tomorrow,
     );
