@@ -87,7 +87,8 @@
 /* ── Clouds ──────────────────────────────────────────────*/
 .cloud-bit {
     position: absolute;
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 0 60px rgba(255, 255, 255, 0.35);
     filter: blur(25px);
     border-radius: 50%;
     opacity: 0.5;

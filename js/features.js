@@ -531,8 +531,10 @@ export function manageAnimations(data) {
     const isRaining   = !isSnowing && (cond.includes('rain') || cond.includes('drizzle') || precip > 0);
     const isHeavy     = cond.includes('heavy') || cond.includes('extreme') || cond.includes('moderate') || cond.includes('thunder');
     const isThunder   = cond.includes('thunder');
+    const isMisty     = cond.includes('mist') || cond.includes('fog') || cond.includes('haze');
+    const isOvercast  = cond.includes('overcast');
     const isPleasant  = !isRaining && !isSnowing && !isThunder && temp >= 15 && temp <= 30 && wind <= 25;
-    const isStargazer = !isDayTime && clouds < 20 && aqi < 20 && !isRaining && !isSnowing;
+    const isStargazer = !isDayTime && clouds < 20 && aqi < 20 && !isRaining && !isSnowing && !isMisty;
 
     // Save conditions so the sound manager can read them
     appState.conditions = { isRaining, isSnowing, isHeavy, wind, isPleasant };
@@ -553,7 +555,10 @@ export function manageAnimations(data) {
     else if (isSnowing)                       body.classList.add('snowy');
     else if (isRaining)                       body.classList.add('rainy');
     else if (!isDayTime)                      body.classList.add('night');
-    else if (clouds > 50)                     body.classList.add('cloudy');
+    else if (isMisty)                         body.classList.add('misty');
+    else if (isOvercast)                      body.classList.add('overcast');
+    else if (clouds > 70)                     body.classList.add('cloudy');
+    else if (clouds > 25 || cond.includes('partly'))   body.classList.add('partly-cloudy');
     else                                      body.classList.add('sunny');
 
     updateThemeColor(body.className);
@@ -650,16 +655,18 @@ export function manageAnimations(data) {
     }
 
     // Cloud particles
-    if (clouds > 15 && !isStargazer) {
-        const rawCount = clouds > 70 ? 8 : 4;
-        const count    = smallMobile ? Math.max(1, Math.floor(rawCount / 4))
-                       : mobile      ? Math.max(2, Math.floor(rawCount / 2))
+    if ((clouds > 15 || isMisty) && !isStargazer) {
+        const isPartly = clouds <= 70 && !cond.includes('overcast') && !isMisty;
+        const rawCount = (clouds > 70 || isMisty) ? 14 : 8;
+        const count    = smallMobile ? Math.max(3, Math.floor(rawCount / 2.5))
+                       : mobile      ? Math.max(5, Math.floor(rawCount / 1.5))
                        : rawCount;
         for (let i = 0; i < count; i++) {
             const cloud          = document.createElement('div');
             cloud.className      = 'cloud-bit';
             cloud.style.left     = Math.random() * 100 + 'vw';
-            cloud.style.top      = Math.random() * 60 + 'vh';
+            cloud.style.top      = (Math.random() * (isPartly ? 35 : 65)) + 'vh';
+            if (isPartly) cloud.style.opacity = '0.55';
             const size           = Math.random() * 200 + 100;
             cloud.style.width    = (size * 1.5) + 'px';
             cloud.style.height   = size + 'px';
@@ -677,7 +684,10 @@ function updateThemeColor(bodyClass) {
     else if (bodyClass.includes('stargazer'))     color = '#020111';
     else if (bodyClass.includes('rainy'))         color = '#203a43';
     else if (bodyClass.includes('snowy'))         color = '#6190E8';
-    else if (bodyClass.includes('cloudy'))        color = '#3e5151';
+    else if (bodyClass.includes('cloudy'))        color = '#2c3e50';
+    else if (bodyClass.includes('partly-cloudy')) color = '#5d6d7e';
+    else if (bodyClass.includes('misty'))         color = '#3e5151';
+    else if (bodyClass.includes('overcast'))      color = '#434050';
     else if (bodyClass.includes('night'))         color = '#0f0c29';
     else if (bodyClass.includes('sunny'))         color = '#1e3c72';
 

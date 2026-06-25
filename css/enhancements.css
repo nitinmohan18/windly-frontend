@@ -79,20 +79,22 @@
 .fday-chevron {
     font-size: 1.2rem;
     opacity: 0.45;
-    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-                opacity 0.2s ease,
-                color 0.2s ease;
+    transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1),
+                opacity 0.3s ease,
+                color 0.3s ease;
     align-self: center;
     flex-shrink: 0;
 }
 
 .fday-row.fday-active {
-    background: rgba(0, 242, 254, 0.07) !important;
-    border-color: rgba(0, 242, 254, 0.25) !important;
+    background: linear-gradient(145deg, rgba(20, 30, 45, 0.8) 0%, rgba(5, 10, 20, 0.6) 100%) !important;
+    border-color: rgba(0, 242, 254, 0.4) !important;
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
     transform: none !important;
-    box-shadow: none !important;
+    box-shadow: 
+        inset 1.5px 1.5px 2px rgba(255, 255, 255, 0.15),
+        inset -1.5px 0 3px rgba(0, 0, 0, 0.5) !important;
 }
 .fday-row.fday-active .fday-chevron {
     transform: rotate(180deg);
@@ -106,16 +108,17 @@
 .fday-detail {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+    transition: max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1),
                 opacity    0.4s ease,
-                padding    0.55s cubic-bezier(0.4, 0, 0.2, 1);
+                padding    0.6s cubic-bezier(0.25, 1, 0.5, 1);
     opacity: 0;
     padding: 0 16px;
-    background: rgba(0, 0, 0, 0.18);
+    background: rgba(5, 10, 15, 0.35);
     border-bottom-left-radius: 18px;
     border-bottom-right-radius: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-top: none;
+    box-shadow: inset 0 10px 20px rgba(0, 0, 0, 0.4);
 }
 .fday-detail.fday-detail-open {
     max-height: 600px;
@@ -149,11 +152,19 @@
     align-items: center;
     gap: 4px;
     padding: 10px 8px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: linear-gradient(145deg, rgba(30, 40, 55, 0.5) 0%, rgba(15, 20, 30, 0.3) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 14px;
     text-align: center;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, transform 0.2s ease;
+    box-shadow: 
+        4px 4px 12px rgba(0, 0, 0, 0.3),
+        inset 1px 1px 2px rgba(255, 255, 255, 0.15),
+        inset -1px -1px 3px rgba(0, 0, 0, 0.4);
+}
+.fday-detail-stat:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(145deg, rgba(40, 50, 70, 0.6) 0%, rgba(20, 25, 40, 0.4) 100%);
 }
 .fday-detail-stat .material-icons { font-size: 1.1rem; }
 .fdd-label {
@@ -183,14 +194,22 @@
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: linear-gradient(145deg, rgba(25, 35, 50, 0.5) 0%, rgba(10, 15, 25, 0.3) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     padding: 8px 5px;
     text-align: center;
     transition: background 0.2s ease, transform 0.2s ease;
+    box-shadow: 
+        3px 3px 8px rgba(0, 0, 0, 0.3),
+        inset 1px 1px 2px rgba(255, 255, 255, 0.12),
+        inset -1px -1px 2px rgba(0, 0, 0, 0.4);
 }
-.detail-hour-card:active { background: rgba(255,255,255,0.1); transform: scale(0.94); }
+.detail-hour-card:active { 
+    background: linear-gradient(145deg, rgba(15, 20, 30, 0.6) 0%, rgba(5, 10, 15, 0.4) 100%);
+    transform: scale(0.94); 
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
 .detail-hour-time  { font-size: 0.62rem; opacity: 0.75; font-weight: 500; white-space: nowrap; }
 .detail-hour-img   { width: 26px; height: 26px; }
 .detail-hour-temp  { font-size: 0.82rem; font-weight: 700; }
@@ -208,12 +227,16 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    background: rgba(0,0,0,0.15);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: linear-gradient(145deg, rgba(25, 35, 50, 0.5) 0%, rgba(10, 15, 25, 0.3) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     padding: 8px 12px;
     flex: 1;
     justify-content: center;
+    box-shadow: 
+        3px 3px 10px rgba(0, 0, 0, 0.3),
+        inset 1px 1px 2px rgba(255, 255, 255, 0.12),
+        inset -1px -1px 3px rgba(0, 0, 0, 0.4);
 }
 .detail-astro-item .material-icons { font-size: 1rem; }
 .detail-astro-label {
@@ -325,36 +348,44 @@
    9. MICRO-INTERACTION ENHANCEMENTS
 ──────────────────────────────────────────────────────── */
 @keyframes fadeSlideUp {
-    from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+    from { opacity: 0; transform: translateY(-8px) scale(0.96); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .hour-card {
-    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.18s ease;
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s ease;
 }
 @media (hover: none) {
-    .hour-card:active { transform: scale(0.93); background: rgba(255,255,255,0.12); }
+    .hour-card:active { transform: scale(0.94); background: rgba(255,255,255,0.15); box-shadow: 0 5px 15px rgba(255,255,255,0.1); }
 }
 
 .stat-item.compact {
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: background 0.3s ease, transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     border-radius: 12px;
 }
 @media (hover: none) {
-    .stat-item.compact:active { background: rgba(0,242,254,0.08); transform: scale(0.96); }
+    .stat-item.compact:active { background: rgba(0,242,254,0.12); transform: scale(0.95); box-shadow: 0 5px 15px rgba(0,242,254,0.15); }
 }
 
 .premium-btn:active {
-    background: rgba(0, 242, 254, 0.12) !important;
-    border-color: rgba(0, 242, 254, 0.3) !important;
+    background: linear-gradient(145deg, rgba(0, 242, 254, 0.15) 0%, rgba(0, 242, 254, 0.05) 100%) !important;
+    border-color: rgba(0, 242, 254, 0.4) !important;
+    transform: scale(0.98) !important;
+    box-shadow: 0 0 20px rgba(0,242,254,0.2) !important;
 }
 
 .city-dock button {
-    transition: background 0.2s ease,
-                transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
-                box-shadow 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
-.city-dock button:active { transform: scale(0.92); }
+.city-dock button:active { transform: scale(0.92); box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+
+/* ── Icon Drop Shadows ── */
+#weather-icon {
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3)) drop-shadow(0 2px 4px rgba(255, 255, 255, 0.15));
+}
+.fday-img, .detail-hour-img {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
 
 /* ────────────────────────────────────────────────────────
    10. THEME TRANSITION IMPROVEMENTS
@@ -464,17 +495,7 @@ body.stargazer .msg-pleasant {
     z-index: 9999 !important;
 }
 
-/* ────────────────────────────────────────────────────────
-   15. FORECAST ROW HOVER — suppress transforms on mobile
-       (hover doesn't exist on touch anyway, avoids paint)
-──────────────────────────────────────────────────────── */
-@media (max-width: 768px) {
-    .fday-row:hover {
-        transform: none;
-        background: rgba(0, 0, 0, 0.2);
-        box-shadow: none;
-    }
-}
+
 
 /* ═══════════════════════════════════════════════════════════
    MOBILE SCROLL & RENDERING FIXES
@@ -549,11 +570,7 @@ body.stargazer .msg-pleasant {
         will-change: auto;
     }
 
-    /* Reduce box-shadow complexity on mobile —
-       multiple layered shadows are expensive to composite */
-    .fday-row {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-    }
+
 
     /* Prevent the AI module backdrop-filter from being
        recalculated on every scroll frame */

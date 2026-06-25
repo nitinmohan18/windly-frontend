@@ -5,13 +5,16 @@
 
 body.sunny        { background: linear-gradient(135deg, #1e3c72, #2a5298, #fbc2eb); }
 body.sunny-extreme{ background: linear-gradient(135deg, #ff416c, #ff4b2b); }
-body.rainy        { background: linear-gradient(135deg, #203a43, #2c5364); }
-body.cloudy       { background: linear-gradient(135deg, #3e5151, #decba4); }
-body.night        { background: linear-gradient(135deg, var(--bg-dark), #302b63, #24243e); }
+body.rainy        { background: linear-gradient(145deg, #0f2027, #203a43, #2c5364); }
+body.cloudy       { background: linear-gradient(135deg, #9ca8b1, #2c3e50); }
+body.partly-cloudy{ background: linear-gradient(135deg, #aeb5b8, #5d6d7e); }
+body.misty        { background: linear-gradient(135deg, #3e5151, #decba4); }
+body.overcast     { background: linear-gradient(135deg, #8E8A9F, #434050); }
+body.night        { background: linear-gradient(145deg, #0f0c29, #302b63, #24243e); }
 body.snowy        { background: linear-gradient(135deg, #6190E8, #A7BFE8); }
-body.stormy-dark  { background: linear-gradient(135deg, #020205, #0a1122, #001224); }
+body.stormy-dark  { background: linear-gradient(145deg, #000000, #0f172a, #1e1b4b); }
 body.stargazer    { 
-    background: linear-gradient(135deg, #020111, #20124d, #000022); 
+    background: radial-gradient(circle at top right, #2b1055, #000428, #000000); 
     color: #e0e5ff;
 }
 
