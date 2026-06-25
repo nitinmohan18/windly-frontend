@@ -596,3 +596,30 @@ body.stargazer .msg-pleasant {
 html {
     scroll-behavior: smooth;
 }
+
+/* ────────────────────────────────────────────────────────
+   MOBILE GPU OPTIMIZATIONS (Zero Visual Changes)
+──────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    /* Force GPU hardware compositing on heavy layout panels.
+       This prevents lag by ensuring the expensive 3D drop-shadows, 
+       glass blurs, and gradients are rendered as static textures 
+       by the GPU when scrolling. */
+    .panel,
+    .fday-row,
+    .fday-detail,
+    .weather-msg,
+    .dashboard-grid,
+    .forecast-card-wrapper {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        perspective: 1000;
+    }
+    
+    /* Optimize touch actions */
+    * {
+        touch-action: pan-y;
+    }
+}
