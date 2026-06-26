@@ -214,17 +214,40 @@ input:focus {
     justify-self: start;  
     align-self: end;      
     margin: 0 !important; 
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    padding: 4px 12px;
-    font-size: 0.7rem;
-    border-radius: 20px;
+    
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.25) 0%, rgba(0, 242, 254, 0.05) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-top: 1px solid rgba(0, 242, 254, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        0 0 10px rgba(0, 242, 254, 0.15),
+        inset 0 1px 3px rgba(255, 255, 255, 0.4);
+    color: #e0faff;
+    padding: 6px 14px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 30px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     min-height: 32px;
 }
-#unit-toggle:hover { background: rgba(255,255,255,0.4); }
+#unit-toggle:hover { 
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.4) 0%, rgba(0, 242, 254, 0.15) 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 6px 16px rgba(0, 0, 0, 0.25),
+        0 0 16px rgba(0, 242, 254, 0.4),
+        inset 0 1px 3px rgba(255, 255, 255, 0.6);
+    color: #ffffff;
+}
+#unit-toggle:active {
+    transform: translateY(0) scale(0.95);
+    box-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.15),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
 
 .condition-row, .info-block.condition-info {
     grid-column: 2;
