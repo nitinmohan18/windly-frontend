@@ -627,3 +627,21 @@ html {
         transform: none !important;
     }
 }
+
+/* ────────────────────────────────────────────────────────
+   DESKTOP ZOOM PERFORMANCE FIX
+   CSS containment tells the browser each panel is an
+   isolated island — during zoom, the browser can rescale
+   the cached bitmap instead of recalculating every
+   backdrop-filter and box-shadow from scratch.
+──────────────────────────────────────────────────────── */
+.panel,
+.graph-card,
+.weather-card,
+.forecast-card,
+.hour-card,
+.fday-row,
+.forecast-card-wrapper,
+#ai-prediction-module {
+    contain: layout style paint;
+}
