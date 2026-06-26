@@ -618,8 +618,12 @@ html {
         perspective: 1000;
     }
     
-    /* Optimize touch actions */
-    * {
-        touch-action: pan-y;
+    /* Disable unnecessary popping touch effects on mobile to prevent accidental jitter while scrolling */
+    .hour-card:active,
+    .detail-hour-card:active,
+    .fday-row:active,
+    .fday-detail-stat:active,
+    .panel:active {
+        transform: none !important;
     }
 }
