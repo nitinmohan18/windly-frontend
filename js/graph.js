@@ -729,12 +729,12 @@ function _drawHourlyGraph(hours) {
                 ctx.fillText(dayNames[d.getDay()], xAt(i), chartBottom + 14);
                 ctx.font      = '10.5px Poppins,sans-serif';
             } else {
-                ctx.fillStyle = active ? '#fff' : 'rgba(255,255,255,0.45)';
+                ctx.fillStyle = active ? '#fff' : 'rgba(255,255,255,0.85)';
                 ctx.fillText(_fmtHour(epochs[i]), xAt(i), chartBottom + 14);
             }
         }
         if ((n - 1) % LABEL_EVERY !== 0 && last >= n - 1) {
-            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
             ctx.font      = '9.5px Poppins,sans-serif';
             ctx.fillText(_fmtHour(epochs[n - 1]), xAt(n - 1), chartBottom + 14);
         }
@@ -768,14 +768,14 @@ function _drawHourlyGraph(hours) {
             ctx.font         = '9px Poppins,sans-serif';
             ctx.textAlign    = 'right';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle    = `rgba(79,172,254,${0.50 * rainAlpha})`;
+            ctx.fillStyle    = `rgba(79,172,254,${0.90 * rainAlpha})`;
             ctx.fillText('RAIN%', PAD.left - 5, rainTop + RAIN_BAR_H / 2);
         }
 
         // ── Y-axis: temperature (left) ────────────────────
         ctx.textAlign    = 'right';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle    = 'rgba(255,140,80,0.70)';
+        ctx.fillStyle    = 'rgba(255,140,80,0.95)';
         ctx.font         = '10.5px Poppins,sans-serif';
         const tStep = (yTmax - yTmin) / 5;
         for (let g = 0; g <= 5; g++) {
@@ -788,7 +788,7 @@ function _drawHourlyGraph(hours) {
 
         // ── Y-axis: humidity (right) ──────────────────────
         ctx.textAlign = 'left';
-        ctx.fillStyle = 'rgba(79,172,254,0.60)';
+        ctx.fillStyle = 'rgba(79,172,254,0.95)';
         for (let g = 0; g <= 4; g++) {
             const h = g * 25;
             ctx.fillText(h + '%', W - PAD.right + 8, yH(h));
