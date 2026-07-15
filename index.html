@@ -539,7 +539,6 @@ html { background: #0f0c29; overscroll-behavior: none; }
 #ai-prediction-module[data-risk="moderate"] .ai-factor-fill { background: linear-gradient(90deg, rgba(105,64,0,0.75), #fbbf24); }
 #ai-prediction-module[data-risk="high"]     .ai-factor-fill { background: linear-gradient(90deg, rgba(98,36,0,0.75),  #f97316); }
 #ai-prediction-module[data-risk="severe"]   .ai-factor-fill { background: linear-gradient(90deg, rgba(98,8,8,0.75),   #ef4444); }
-
 /* ── 9. Mobile adjustments ────────────────────────────── */
 @media (max-width: 480px) {
     .ai-header            { padding: 15px 15px 12px; }
@@ -567,7 +566,7 @@ html { background: #0f0c29; overscroll-behavior: none; }
     }
     .ai-factor-row  { grid-template-columns: 18px 1fr 40px; }
 }
-    </style>
+</style>
 </head>
 <body>
 
@@ -580,15 +579,19 @@ html { background: #0f0c29; overscroll-behavior: none; }
             <span class="brand-badge">AI</span>
         </a>
         <nav class="site-nav" aria-label="Main navigation">
-            <a href="#main-card" class="nav-link active">
+            <a href="#main-card" class="nav-link active" id="header-weather-btn">
                 <span class="material-icons">cloud</span>
                 <span>Weather</span>
             </a>
-            <a href="#forecast-wrapper" class="nav-link">
+            <a href="#forecast-wrapper" class="nav-link" id="header-forecast-btn">
                 <span class="material-icons">calendar_month</span>
                 <span>Forecast</span>
             </a>
-            <a href="#ai-prediction-module" class="nav-link">
+            <a href="#graph-card-wrapper" class="nav-link" id="header-graph-btn">
+                <span class="material-icons">show_chart</span>
+                <span>Graph</span>
+            </a>
+            <a href="#ai-prediction-module" class="nav-link" id="header-ai-btn">
                 <span class="material-icons">psychology</span>
                 <span>AI Insight</span>
             </a>
@@ -657,6 +660,14 @@ html { background: #0f0c29; overscroll-behavior: none; }
                         <button id="search-btn"   aria-label="Search"><span class="material-icons">search</span></button>
                         <button id="mic-btn"      aria-label="Voice search"><span class="material-icons">mic</span></button>
                         <button id="location-btn" aria-label="Use my location"><span class="material-icons">my_location</span></button>
+                    </div>
+
+                    <!-- ════ MAIN CARD WEATHER ALERT ════ -->
+                    <div id="main-card-alert" class="main-card-alert-pill" style="position:relative;z-index:100;">
+                        <span class="material-icons alert-icon">warning</span>
+                        <div class="alert-marquee-box">
+                            <span class="alert-text" id="main-card-alert-text">Severe Weather Alert</span>
+                        </div>
                     </div>
 
                     <div class="hero-section" style="position:relative;z-index:101;">

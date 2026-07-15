@@ -233,8 +233,14 @@ export function setupForecastTabs() {
             if (panel) panel.classList.add('fp-active');
             // Re-draw graph when switching to the graph tab — the canvas
             // may have been rendered while the tab was hidden (zero width)
-            if (tab.dataset.tab === 'graph' && _currentData) {
-                setTimeout(() => renderWeatherGraph(_currentData), 60);
+            if (tab.dataset.tab === 'graph') {
+                if (_currentData) {
+                    setTimeout(() => renderWeatherGraph(_currentData), 60);
+                }
+                const graphCard = document.getElementById('graph-card-wrapper');
+                if (graphCard) {
+                    setTimeout(() => graphCard.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+                }
             }
         });
     });

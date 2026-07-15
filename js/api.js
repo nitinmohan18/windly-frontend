@@ -222,7 +222,6 @@ function _setAIOffline() {
 //   after sleep can take 30-40 seconds. We give it 50s before aborting,
 //   and show a calm waiting message after 7s so the user knows to hang tight.
 export async function fetchData(q) {
-    if (!q || !q.toString().trim()) return;
     setLoadingState();
 
     const controller = new AbortController();
@@ -241,11 +240,11 @@ export async function fetchData(q) {
     // ── Block 1: Network / fetch errors ──────────────────
     let data;
     try {
-        const query    = encodeURIComponent(q.toString().trim());
-        const response = await fetch(
-            `${CONFIG.BASE_URL}/weather/forecast?q=${query}`,
-            { signal: controller.signal }
-        );
+        const url = (q && q.toString().trim())
+            ? `${CONFIG.BASE_URL}/weather/forecast?q=${encodeURIComponent(q.toString().trim())}`
+            : `${CONFIG.BASE_URL}/weather/forecast`;
+            
+        const response = await fetch(url, { signal: controller.signal });
 
         // Server responded — cancel both timers.
         // clearTimeout on an already-fired timer is safe (no-op).
@@ -308,6 +307,96 @@ export async function fetchData(q) {
 
     try { renderForecastCard(data); }
     catch (err) { console.warn('renderForecastCard error (non-critical):', err.message); }
+
+    // Render Auto-Location & Alerts
+    try {
+        const locSlot = document.getElementById('footer-location-slot');
+        const mainCardAlert = document.getElementById('main-card-alert');
+
+        const allAlerts = data.alerts?.alert || [];
+        
+        if (allAlerts.length > 0) {
+            // 1. ALWAYS show the most critical alert in the warning pill
+            const currentAlert = allAlerts[0];
+            const headline = currentAlert.headline || currentAlert.event || 'Weather Alert';
+            
+            if (mainCardAlert) {
+                document.getElementById('main-card-alert-text').textContent = headline;
+                mainCardAlert.classList.add('show');
+                mainCardAlert.title = currentAlert.desc || headline;
+            }
+
+            // 2. Check if ANY alert is severe enough to trigger the red emergency background
+            const isSevereEmergency = allAlerts.some(alert => {
+                const sev = (alert.severity || '').toLowerCase();
+                const head = (alert.headline || '').toLowerCase();
+                const event = (alert.event || '').toLowerCase();
+                
+                // EXPLICITLY IGNORE SAFE/MINOR ALERTS FIRST
+                // Even if the API calls it a "Warning" or "Moderate", if it's explicitly "Green" or "Yellow" (or "Grüne"), it's safe!
+                if (sev === 'minor' || head.includes('green') || head.includes('grüne') || head.includes('yellow') || head.includes('gelbe')) {
+                    return false;
+                }
+                
+                // Check API severity fields (Adding 'moderate' as requested)
+                if (sev === 'severe' || sev === 'extreme' || sev === 'moderate') return true;
+                
+                // Fallback: Check for emergency keywords
+                if (head.includes('red ') || head.includes('orange ') || head.includes('warning') || head.includes('warnung') || head.includes('emergency') || head.includes('severe')) return true;
+                if (event.includes('warning') || event.includes('warnung') || event.includes('emergency')) return true;
+                
+                return false;
+            });
+            
+            // 3. App-Wide Background State & Pill Styling
+            if (isSevereEmergency) {
+                document.body.classList.add('severe-weather-alert');
+            } else {
+                document.body.classList.remove('severe-weather-alert');
+            }
+
+            // Determine specific color theme for the warning pill based on the alert
+            let pillColorClass = 'red'; // default for severe
+            const headStr = headline.toLowerCase();
+            const sevStr = (currentAlert.severity || '').toLowerCase();
+            
+            if (headStr.includes('green') || headStr.includes('grüne') || sevStr === 'minor') {
+                pillColorClass = 'green';
+            } else if (headStr.includes('yellow') || headStr.includes('gelb')) {
+                pillColorClass = 'yellow';
+            } else if (headStr.includes('orange')) {
+                pillColorClass = 'orange';
+            }
+            
+            if (mainCardAlert) {
+                // Clear any previous color classes
+                mainCardAlert.classList.remove('red', 'orange', 'yellow', 'green', 'advisory');
+                mainCardAlert.classList.add(pillColorClass);
+            }
+            
+            // 4. Keep the footer slot showing the IP location
+            if (locSlot) {
+                locSlot.innerHTML = `
+                    <span class="material-icons slot-icon">my_location</span>
+                    <span class="slot-text">${data.location.name}, ${data.location.country} (IP Synced)</span>
+                `;
+            }
+            
+        } else {
+            // No alerts — perfectly safe state
+            document.body.classList.remove('severe-weather-alert');
+            if (mainCardAlert) {
+                mainCardAlert.className = 'main-card-alert-pill'; // Reset to base classes only
+            }
+            
+            if (locSlot) {
+                locSlot.innerHTML = `
+                    <span class="material-icons slot-icon">my_location</span>
+                    <span class="slot-text">${data.location.name}, ${data.location.country} (IP Synced)</span>
+                `;
+            }
+        }
+    } catch (err) { console.warn('alert render error:', err.message); }
 
     try { manageAnimations(data); }
     catch (err) { console.warn('manageAnimations error (non-critical):', err.message); }
