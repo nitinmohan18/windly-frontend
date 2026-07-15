@@ -323,7 +323,14 @@ export async function fetchData(q) {
             if (mainCardAlert) {
                 document.getElementById('main-card-alert-text').textContent = headline;
                 mainCardAlert.classList.add('show');
-                mainCardAlert.title = currentAlert.desc || headline;
+                
+                // Add click listener to open the dedicated alert page
+                mainCardAlert.onclick = () => {
+                    sessionStorage.setItem('windly_alert_headline', headline);
+                    sessionStorage.setItem('windly_alert_desc', currentAlert.desc || headline);
+                    sessionStorage.setItem('windly_alert_instruction', currentAlert.instruction || '');
+                    window.open('alert.html', '_blank');
+                };
             }
 
             // 2. Check if ANY alert is severe enough to trigger the red emergency background

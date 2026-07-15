@@ -105,7 +105,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (headerAIBtn) {
         headerAIBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            document.getElementById('ai-prediction-module').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // The AI Module is structurally appended inside the Forecast architecture.
+            // If the forecast is closed, the AI card is completely hidden (width 0 or height 0).
+            const wrapper = document.getElementById('forecast-wrapper');
+            if (wrapper && !wrapper.classList.contains('open')) {
+                toggleForecast(); 
+            }
+            
+            const aiModule = document.getElementById('ai-prediction-module');
+            if (aiModule) {
+                // On mobile, the AI module is appended inside the "Days" tab panel.
+                // We must ensure the "Days" tab is active so it's not display:none.
+                const daysTab = document.querySelector('.ftab[data-tab="days"]');
+                if (daysTab) daysTab.click();
+                
+                // Allow CSS transition to unlock the height/width before scrolling
+                setTimeout(() => {
+                    aiModule.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+            
             updateNavActiveState(headerAIBtn);
         });
     }
