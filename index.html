@@ -42,12 +42,11 @@ html { background: #0f0c29; overscroll-behavior: none; }
 
   body {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
     min-height: 100vh;
     background: #0f0c29;
     overflow-x: hidden;
-    padding: 40px 0;
+    padding: 0;
   }
 
   .app-wrapper {
@@ -56,6 +55,7 @@ html { background: #0f0c29; overscroll-behavior: none; }
     justify-content: center;
     width: 100%;
     max-width: 900px;
+    margin: 60px auto 40px; /* Perfect balanced gap */
     padding: 0 15px;
     opacity: 0;
   }
@@ -571,6 +571,35 @@ html { background: #0f0c29; overscroll-behavior: none; }
 </head>
 <body>
 
+<!-- ════ PREMIUM SITE HEADER ════ -->
+<header class="site-header" id="site-header">
+    <div class="site-header-inner">
+        <a href="/" class="site-brand" aria-label="Windly Home">
+            <span class="brand-icon material-icons">air</span>
+            <span class="brand-wordmark">WINDLY</span>
+            <span class="brand-badge">AI</span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+            <a href="#main-card" class="nav-link active">
+                <span class="material-icons">cloud</span>
+                <span>Weather</span>
+            </a>
+            <a href="#forecast-wrapper" class="nav-link">
+                <span class="material-icons">calendar_month</span>
+                <span>Forecast</span>
+            </a>
+            <a href="#ai-prediction-module" class="nav-link">
+                <span class="material-icons">psychology</span>
+                <span>AI Insight</span>
+            </a>
+        </nav>
+        <div class="header-status">
+            <span class="header-live-dot"></span>
+            <span class="header-live-text">LIVE</span>
+        </div>
+    </div>
+</header>
+
 <div id="weather-stage"></div>
 <div id="lightning-flash"></div>
 
@@ -1010,6 +1039,77 @@ html { background: #0f0c29; overscroll-behavior: none; }
     }
 })();
 </script>
+
+<script>
+/* ── Site Header: scroll-aware + smooth nav ── */
+(function () {
+    var hdr = document.getElementById('site-header');
+    if (!hdr) return;
+
+    /* Add .scrolled when user scrolls past 40 px */
+    var scrolled = false;
+    window.addEventListener('scroll', function () {
+        var s = window.scrollY > 40;
+        if (s !== scrolled) {
+            scrolled = s;
+            hdr.classList.toggle('scrolled', s);
+        }
+    }, { passive: true });
+
+    /* Smooth-scroll anchor links in header & footer */
+    document.querySelectorAll('.nav-link, .footer-link').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            var href = a.getAttribute('href');
+            if (!href || href.charAt(0) !== '#') return;
+            var target = document.querySelector(href);
+            if (!target) return;
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            /* Update active nav link */
+            document.querySelectorAll('.nav-link').forEach(function (n) { n.classList.remove('active'); });
+            var matching = document.querySelector('.nav-link[href="' + href + '"]');
+            if (matching) matching.classList.add('active');
+        });
+    });
+})();
+</script>
+
+<!-- ════ PREMIUM DASHBOARD FOOTER ════ -->
+<footer class="site-footer" id="site-footer">
+    <div class="footer-inner">
+        
+        <!-- Top Row: Brand & Feature Slots -->
+        <div class="footer-main-row">
+            <div class="footer-brand-section">
+                <div class="footer-brand">
+                    <span class="brand-icon material-icons">air</span>
+                    <span class="footer-brand-name">WINDLY</span>
+                </div>
+                <p class="footer-tagline">Advanced atmospheric intelligence</p>
+            </div>
+            
+            <div class="footer-features-section" id="footer-features">
+                <!-- Future home of IP Auto-Location and Weather Alerts -->
+                <div class="feature-slot" id="footer-location-slot">
+                    <span class="material-icons slot-icon">my_location</span>
+                    <span class="slot-text">Auto-Location Syncing...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Copyright & Status -->
+        <div class="footer-bottom-row">
+            <span class="footer-copy">&copy; 2025 Crafted by Nitin Mohan</span>
+            <div class="footer-api-status">
+                <span class="api-dot"></span>
+                <span>LIVE DATA SYNC</span>
+            </div>
+        </div>
+
+    </div>
+</footer>
+
 <!-- Vercel Analytics -->
     <script defer src="/_vercel/insights/script.js"></script>
 </body>
