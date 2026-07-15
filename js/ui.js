@@ -68,6 +68,21 @@ export function setLoadingState() {
 export function updateUI(data) {
     const { location, current } = data;
 
+    // Update Local Time
+    const timeSlot = document.getElementById('footer-time-slot');
+    const timeText = document.getElementById('footer-local-time');
+    if (timeSlot && timeText && location.localtime) {
+        const timeStr = location.localtime.split(' ')[1]; // Extract "HH:MM"
+        if (timeStr) {
+            let [hour, minute] = timeStr.split(':');
+            hour = parseInt(hour, 10);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            hour = hour % 12 || 12;
+            timeText.innerText = `Local Time: ${hour}:${minute} ${ampm}`;
+            timeSlot.style.display = 'inline-flex';
+        }
+    }
+
     const cityDisplay = document.getElementById('city-display');
     if (cityDisplay) cityDisplay.innerText = location.name;
 
@@ -144,6 +159,17 @@ export function updateUI(data) {
     }
 
     triggerSunAnimation();
+    
+    // Update the new highly-useful header status with the actual API last_updated time
+    const lastUpdateEl = document.getElementById('header-last-updated');
+    if (lastUpdateEl && current.last_updated) {
+        const textEl = lastUpdateEl.querySelector('.header-live-text');
+        if (textEl) {
+            // "2026-07-16 00:45" -> "00:45"
+            const timeStr = current.last_updated.split(' ')[1] || current.last_updated;
+            textEl.innerText = `Updated at ${timeStr}`;
+        }
+    }
 }
 
 // ── Sun Arc Animation ─────────────────────────────────────
