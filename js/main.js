@@ -35,8 +35,80 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toggleBtn = document.getElementById('forecast-toggle-btn');
     const closeBtn  = document.getElementById('close-forecast-btn');
+    const headerForecastBtn = document.getElementById('header-forecast-btn');
+
+    const headerWeatherBtn  = document.getElementById('header-weather-btn');
+    const headerGraphBtn    = document.getElementById('header-graph-btn');
+    const headerAIBtn       = document.getElementById('header-ai-btn');
+
     if (toggleBtn) toggleBtn.addEventListener('click', toggleForecast);
     if (closeBtn)  closeBtn.addEventListener('click',  toggleForecast);
+
+    function updateNavActiveState(activeBtn) {
+        document.querySelectorAll('.site-nav .nav-link').forEach(btn => btn.classList.remove('active'));
+        if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    if (headerWeatherBtn) {
+        headerWeatherBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const wrapper = document.getElementById('forecast-wrapper');
+            // Close forecast if it is open, returning to single-column view
+            if (wrapper && wrapper.classList.contains('open')) {
+                toggleForecast();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            updateNavActiveState(headerWeatherBtn);
+        });
+    }
+
+    if (headerForecastBtn) {
+        headerForecastBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const wrapper = document.getElementById('forecast-wrapper');
+            if (wrapper && !wrapper.classList.contains('open')) toggleForecast(); 
+            else if (wrapper) wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Explicitly switch to Forecast tab
+            const daysTab = document.querySelector('.ftab[data-tab="days"]');
+            if (daysTab) daysTab.click();
+            updateNavActiveState(headerForecastBtn);
+        });
+    }
+
+    if (headerGraphBtn) {
+        headerGraphBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // The swinging Graph card is structurally tied to the Forecast architecture.
+            // If the forecast is closed, the graph card is display:none. We must open it first.
+            const wrapper = document.getElementById('forecast-wrapper');
+            if (wrapper && !wrapper.classList.contains('open')) {
+                toggleForecast(); 
+            }
+            
+            const graphCard = document.getElementById('graph-card-wrapper');
+            if (graphCard) {
+                // Ensure the Graph tab is actively selected
+                const graphTab = document.querySelector('.ftab[data-tab="graph"]');
+                if (graphTab) graphTab.click();
+                
+                // Allow the CSS animation to initialize before scrolling
+                setTimeout(() => {
+                    graphCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+            updateNavActiveState(headerGraphBtn);
+        });
+    }
+
+    if (headerAIBtn) {
+        headerAIBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('ai-prediction-module').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            updateNavActiveState(headerAIBtn);
+        });
+    }
 
     setupSwipeToCloseForecast();
     setupForecastTabs();

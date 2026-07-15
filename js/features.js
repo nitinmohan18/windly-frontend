@@ -82,15 +82,20 @@ export function applyAmbientSounds() {
     }
 
     // Birds during the day, crickets at night
-    if (isDayTime) {
-        if (isPleasant && !isRaining && !isSnowing) {
-            birdsSound.volume = 1.0;
-            birdsSound.play().catch(() => {});
-        }
-    } else {
-        if (!isHeavy) {
-            cricketsSound.volume = 0.8;
-            cricketsSound.play().catch(() => {});
+    // (Muted during severe weather emergencies to maintain the serious tone)
+    const hasSevereAlert = document.body.classList.contains('severe-weather-alert');
+    
+    if (!hasSevereAlert) {
+        if (isDayTime) {
+            if (isPleasant && !isRaining && !isSnowing) {
+                birdsSound.volume = 1.0;
+                birdsSound.play().catch(() => {});
+            }
+        } else {
+            if (!isHeavy) {
+                cricketsSound.volume = 0.8;
+                cricketsSound.play().catch(() => {});
+            }
         }
     }
 }
@@ -515,7 +520,11 @@ export function manageAnimations(data) {
     const msgBox = document.getElementById('weather-msg');
 
     if (stage) stage.innerHTML = '';
+    
+    // Preserve the severe weather alert class if it was set by the API
+    const hasSevereAlert = body.classList.contains('severe-weather-alert');
     body.className = '';
+    if (hasSevereAlert) body.classList.add('severe-weather-alert');
 
     if (appState.stormTimeout) clearTimeout(appState.stormTimeout);
 
