@@ -421,16 +421,76 @@ export async function fetchData(q) {
     );
 }
 
+// ── Premium Fuzzy Spell Check for Top Cities ───────────────
+const COMMON_CITIES = [
+    "London", "New York", "Paris", "Tokyo", "Sydney", "Berlin", "Los Angeles", 
+    "Chicago", "Toronto", "Dubai", "Rome", "Madrid", "Beijing", "Mumbai", 
+    "Moscow", "Cairo", "Seoul", "Jakarta", "Mexico City", "Istanbul", 
+    "Shanghai", "Delhi", "Bangkok", "Houston", "Dallas", "Singapore", 
+    "Washington", "Barcelona", "Atlanta", "Miami", "Seattle", "Boston", 
+    "Melbourne", "Montreal", "Amsterdam", "Vienna", "Prague", "Stockholm", 
+    "Dublin", "Athens", "Munich", "Frankfurt", "Zurich", "Geneva",
+    "San Francisco", "Las Vegas", "Orlando", "Denver", "Austin", "Kolkata"
+];
+
+function levenshtein(a, b) {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1,
+                    Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
+}
+
+function getFuzzyCorrection(query) {
+    const q = query.toLowerCase();
+    let best = null;
+    let minD = 3; // Max typo severity to auto-correct
+    for (const city of COMMON_CITIES) {
+        const c = city.toLowerCase();
+        if (Math.abs(c.length - q.length) > 2) continue;
+        const d = levenshtein(q, c);
+        if (d < minD) {
+            minD = d;
+            best = city;
+            if (d === 1) break; // Perfect fuzzy match
+        }
+    }
+    return best;
+}
+
 // ── City Autocomplete ─────────────────────────────────────
-// Returns city suggestions as the user types. Empty array on failure.
-export async function fetchSuggestions(query) {
+// Returns city suggestions as the user types. Implements premium fuzzy fallback.
+export async function fetchSuggestions(query, isRetry = false) {
     if (!query || query.length < 3) return [];
     try {
         const r = await fetch(
             `${CONFIG.BASE_URL}/weather/search?q=${encodeURIComponent(query)}`
         );
         if (!r.ok) return [];
-        return await r.json();
+        const results = await r.json();
+        
+        // Premium feature: If 0 results on a typo, auto-correct and try once more
+        if (results.length === 0 && !isRetry && query.length >= 4) {
+            const corrected = getFuzzyCorrection(query);
+            if (corrected && corrected.toLowerCase() !== query.toLowerCase()) {
+                return await fetchSuggestions(corrected, true); // Recursive retry with correct spelling
+            }
+        }
+        
+        return results;
     } catch {
         return [];
     }
