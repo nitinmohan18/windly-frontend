@@ -826,12 +826,18 @@ body.severe-weather-alert .site-brand .brand-badge {
     letter-spacing: 2px;
     text-transform: uppercase;
     padding-left: 100%; /* Starts off-screen to the right */
-    animation: pillMarquee 20s linear infinite; /* Smooth, slow scroll */
+    animation: pillMarquee 24s linear infinite; /* Smooth, slower scroll */
+    
+    /* Hardware acceleration to fix lagginess/jitter */
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 @keyframes pillMarquee {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
+    0%   { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
 }
 
 /* 1. RED (Severe Emergency) */
