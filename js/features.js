@@ -597,6 +597,10 @@ export function manageAnimations(data) {
 
     if (!stage) return;
 
+    // Premium performance optimization: 
+    // Use a DocumentFragment to batch all DOM injections into a single frame, guaranteeing zero freeze/jank.
+    const fragment = document.createDocumentFragment();
+
     const mobile      = isMobile();
     const smallMobile = isSmallMobile();
 
@@ -610,7 +614,7 @@ export function manageAnimations(data) {
             star.style.left     = (Math.random() * 80 + 20) + 'vw';
             star.style.animationDuration = (Math.random() * 2 + 2) + 's';
             star.style.animationDelay    = (Math.random() * 8) + 's';
-            stage.appendChild(star);
+            fragment.appendChild(star);
         }
 
     } else if (isSnowing) {
@@ -626,22 +630,50 @@ export function manageAnimations(data) {
             flake.style.width    = flake.style.height = size + 'px';
             flake.style.animationDuration = (Math.random() * 3 + 3) * speedMult + 's';
             flake.style.animationDelay    = Math.random() * 5 + 's';
-            stage.appendChild(flake);
+            fragment.appendChild(flake);
         }
 
     } else if (isRaining) {
-        const rawCount = isHeavy ? 80 : 30;
+        // Premium Hyper-Realistic 3D Rain Parallax System
+        const rawCount = isHeavy ? 120 : 50;
         const count    = smallMobile ? Math.floor(rawCount / 5) : mobile ? Math.floor(rawCount / 2.5) : rawCount;
-        const speed    = isHeavy ? 0.3 : 0.7;
+        const baseSpeed = isHeavy ? 0.3 : 0.7;
+        
         for (let i = 0; i < count; i++) {
-            const drop          = document.createElement('div');
-            drop.className      = isHeavy ? 'rain-drop tilted' : 'rain-drop';
-            drop.style.left     = (Math.random() * 120 - 10) + 'vw';
-            drop.style.width    = isHeavy ? '3px' : '1.5px';
-            drop.style.height   = isHeavy ? '35px' : '15px';
+            const drop = document.createElement('div');
+            drop.className = isHeavy ? 'rain-drop tilted' : 'rain-drop';
+            drop.style.left = (Math.random() * 120 - 10) + 'vw';
+            
+            // Generate 3 layers of depth for realistic parallax
+            const depth = Math.random();
+            let height, width, speed, opacity;
+
+            if (depth < 0.2) { 
+                // Foreground (fast, large, optically softened without expensive blur filters)
+                width = isHeavy ? 3.5 : 2.5;
+                height = isHeavy ? 60 : 40;
+                speed = baseSpeed * 0.6;
+                opacity = 0.55; // Lower opacity simulates being out-of-focus perfectly
+            } else if (depth < 0.6) { 
+                // Midground
+                width = isHeavy ? 2 : 1.5;
+                height = isHeavy ? 40 : 25;
+                speed = baseSpeed;
+                opacity = 0.8; // Sharp and clear in the focal plane
+            } else { 
+                // Background (slow, tiny, distant)
+                width = 1;
+                height = isHeavy ? 20 : 15;
+                speed = baseSpeed * 1.5;
+                opacity = 0.3;
+            }
+
+            drop.style.width = width + 'px';
+            drop.style.height = height + 'px';
+            drop.style.opacity = opacity;
             drop.style.animationDuration = (Math.random() * 0.2 + speed) + 's';
-            drop.style.animationDelay    = Math.random() * 2 + 's';
-            stage.appendChild(drop);
+            drop.style.animationDelay = (Math.random() * 2) + 's';
+            fragment.appendChild(drop);
         }
     }
 
@@ -653,13 +685,40 @@ export function manageAnimations(data) {
                        : rawCount;
         const speed    = wind > 40 ? 0.4 : wind > 25 ? 0.8 : wind > 20 ? 1.5 : 3;
         for (let i = 0; i < count; i++) {
-            const wLine               = document.createElement('div');
-            wLine.className           = 'wind-line';
-            wLine.style.top           = Math.random() * 100 + 'vh';
-            wLine.style.width         = (Math.random() * 100 + 50) + 'px';
-            wLine.style.animationDuration = (Math.random() * 0.5 + speed) + 's';
-            wLine.style.animationDelay    = Math.random() * 3 + 's';
-            stage.appendChild(wLine);
+            const wLine = document.createElement('div');
+            wLine.className = 'wind-line';
+            wLine.style.top = Math.random() * 100 + 'vh';
+            
+            // Premium Zero-Lag Parallax Depth System
+            const depth = Math.random();
+            let height, width, lineSpeed, opacity;
+            
+            if (depth < 0.2) {
+                // Foreground (fast, very wide, slightly thicker, ghostly opacity)
+                width = Math.random() * 150 + 100;
+                height = 3;
+                lineSpeed = speed * 0.6;
+                opacity = 0.45; // Soft out-of-focus illusion
+            } else if (depth < 0.6) {
+                // Midground (focal plane)
+                width = Math.random() * 100 + 50;
+                height = 2;
+                lineSpeed = speed;
+                opacity = 0.75; // Sharp and clear
+            } else {
+                // Background (slow, short, thin, distant)
+                width = Math.random() * 50 + 20;
+                height = 1;
+                lineSpeed = speed * 1.5;
+                opacity = 0.25;
+            }
+
+            wLine.style.width = width + 'px';
+            wLine.style.height = height + 'px';
+            wLine.style.opacity = opacity;
+            wLine.style.animationDuration = (Math.random() * 0.5 + lineSpeed) + 's';
+            wLine.style.animationDelay = Math.random() * 3 + 's';
+            fragment.appendChild(wLine);
         }
     }
 
@@ -680,9 +739,13 @@ export function manageAnimations(data) {
             cloud.style.width    = (size * 1.5) + 'px';
             cloud.style.height   = size + 'px';
             cloud.style.animationDuration = (Math.random() * 20 + 30) + 's';
-            stage.appendChild(cloud);
+            cloud.style.animationDuration = (Math.random() * 20 + 30) + 's';
+            fragment.appendChild(cloud);
         }
     }
+    
+    // Inject all particles into the DOM in exactly one single render frame
+    stage.appendChild(fragment);
 }
 
 // Update the browser chrome color to match the current weather theme

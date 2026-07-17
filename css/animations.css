@@ -63,13 +63,18 @@
     100% { transform: translate(-50%, -50%) scale(2.5) rotate(90deg); opacity: 0; }
 }
 
-/* ── Rain Drops ──────────────────────────────────────────*/
+/* ── Premium Rain Drops ──────────────────────────────────*/
 .rain-drop {
     position: absolute;
-    background: rgba(255,255,255,0.6);
-    width: 2px;
+    width: 1.5px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+    border-radius: 50% 50% 0 0;
     animation: fall linear infinite;
+    
+    /* Hardware acceleration for 0 lag */
     will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 /* Tilted variant for heavy/stormy rain */
 .rain-drop.tilted { animation: fall-tilted linear infinite; }
@@ -100,10 +105,13 @@
 .wind-line {
     position: absolute;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    height: 2px;
     border-radius: 50%;
     animation: blow linear infinite;
+    
+    /* Zero-lag hardware acceleration */
     will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 /* ── Lightning Flash (full-screen white overlay) ─────────*/
@@ -159,13 +167,19 @@
 }
 
 @keyframes pulse      { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-@keyframes fall        { to { transform: translateY(110vh); } }
+@keyframes fall { 
+    from { transform: translate3d(0, -10vh, 0); }
+    to   { transform: translate3d(0, 110vh, 0); } 
+}
 @keyframes fall-tilted {
-    from { transform: translateY(-10vh) translateX(0); }
-    to   { transform: translateY(110vh) translateX(-5vw); }
+    from { transform: translate3d(0, -10vh, 0); }
+    to   { transform: translate3d(-10vw, 110vh, 0); }
 }
 @keyframes drift       { from { transform: translateX(-30vw); } to { transform: translateX(120vw); } }
-@keyframes blow        { from { transform: translateX(-30vw); } to { transform: translateX(120vw); } }
+@keyframes blow { 
+    from { transform: translate3d(-30vw, 0, 0); } 
+    to   { transform: translate3d(120vw, 0, 0); } 
+}
 @keyframes snow-fall   {
     0%   { transform: translateY(-10vh) translateX(0); }
     50%  { transform: translateY(50vh)  translateX(25px); }
