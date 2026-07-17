@@ -752,28 +752,6 @@ body.severe-weather-alert {
     /* No longer overriding the background, allowing the beautiful weather theme to show */
 }
 
-/* Glowing red corner indicator for emergencies */
-body.severe-weather-alert::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    /* Sophisticated, deep atmospheric colors. Massive gradient spread prevents any cheap 'blob' shapes. */
-    background: 
-        radial-gradient(400px circle at 0% 0%, rgba(255, 59, 48, 0.4) 0%, transparent 100%),
-        radial-gradient(900px circle at 0% 0%, rgba(100, 10, 10, 0.3) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 10;
-    /* A very slow, deliberate, elegant breathing effect instead of an erratic flash */
-    animation: professionalEmergencyPulse 6s ease-in-out infinite alternate;
-}
-
-@keyframes professionalEmergencyPulse {
-    0%   { opacity: 0.3; }
-    100% { opacity: 0.9; }
-}
 
 /* ── Seamless Header Integration ── */
 /* The header now remains completely untouched during emergencies, preserving the pure glassmorphic look */
