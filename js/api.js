@@ -138,7 +138,7 @@ function _updateAIModule(pct, riskKey, riskLabel, mainMsg, subMsg, inputs, tomor
 
         const iconEl = document.getElementById('ai-tomorrow-icon');
         if (iconEl && tomorrowDay.day.condition?.icon) {
-            iconEl.src = 'https:' + tomorrowDay.day.condition.icon;
+            iconEl.src = tomorrowDay.day.condition.icon.startsWith('http') ? tomorrowDay.day.condition.icon : 'https:' + tomorrowDay.day.condition.icon;
             iconEl.alt = tomorrowDay.day.condition.text;
         }
     }

@@ -119,7 +119,7 @@ export function updateUI(data) {
     // Use the 2x icon on high-DPI screens for sharper rendering
     const iconImg = document.getElementById('weather-icon');
     if (iconImg) {
-        const baseUrl   = 'https:' + current.condition.icon;
+        const baseUrl   = current.condition.icon.startsWith('http') ? current.condition.icon : 'https:' + current.condition.icon;
         iconImg.src     = window.devicePixelRatio >= 2
             ? baseUrl.replace('64x64', '128x128')
             : baseUrl;
@@ -222,7 +222,7 @@ export function renderHourlyForecast(data) {
             ? Math.round(hourData.temp_c) + '°C'
             : Math.round(hourData.temp_f) + '°F';
         const precip  = hourData.precip_mm;
-        const iconUrl = 'https:' + hourData.condition.icon;
+        const iconUrl = hourData.condition.icon.startsWith('http') ? hourData.condition.icon : 'https:' + hourData.condition.icon;
 
         const card = document.createElement('div');
         card.className = 'hour-card';
@@ -287,7 +287,7 @@ export function renderForecastCard(data) {
             weekday: 'long', month: 'short', day: 'numeric',
         });
 
-        const icon       = 'https:' + dayData.day.condition.icon;
+        const icon       = dayData.day.condition.icon.startsWith('http') ? dayData.day.condition.icon : 'https:' + dayData.day.condition.icon;
         const min        = Math.round(appState.isCelsius ? dayData.day.mintemp_c : dayData.day.mintemp_f);
         const max        = Math.round(appState.isCelsius ? dayData.day.maxtemp_c : dayData.day.maxtemp_f);
         const avg        = Math.round(appState.isCelsius ? dayData.day.avgtemp_c : dayData.day.avgtemp_f);
@@ -353,7 +353,7 @@ export function renderForecastCard(data) {
                 if (i % 2 === 0) {
                     const time  = new Date(h.time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
                     const hTemp = Math.round(appState.isCelsius ? h.temp_c : h.temp_f);
-                    const hIcon = 'https:' + h.condition.icon;
+                    const hIcon = h.condition.icon.startsWith('http') ? h.condition.icon : 'https:' + h.condition.icon;
                     hourlyHtml += `
                         <div class="detail-hour-card" role="listitem" aria-label="${time}: ${hTemp}°, ${h.condition.text}">
                             <span class="detail-hour-time">${time}</span>
