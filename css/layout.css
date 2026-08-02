@@ -246,3 +246,14 @@
     .mini-sun     { top: -6px; left: 19px; width: 12px; height: 12px; }
     .track-time   { font-size: 0.8rem; }
 }
+
+/* ── Mobile: disable expensive layout-reflow transitions ── */
+@media (max-width: 768px) {
+    .app-wrapper {
+        transition: none;
+    }
+    .forecast-card-wrapper {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+}
+
