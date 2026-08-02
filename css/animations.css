@@ -143,8 +143,8 @@
 @keyframes riseArc { from { transform: rotate(-90deg); } to { transform: rotate(0deg); } }
 @keyframes setArc  { from { transform: rotate(0deg);  } to { transform: rotate(90deg); } }
 @keyframes glowPulsate {
-    from { box-shadow: 0 0 10px #ffeb3b; }
-    to   { box-shadow: 0 0 25px #ff9800; transform: scale(1.1); }
+    from { box-shadow: 0 0 6px #ffeb3b; }
+    to   { box-shadow: 0 0 12px #ff9800; transform: scale(1.05); }
 }
 
 /* ── Base Keyframes ──────────────────────────────────────*/
@@ -192,9 +192,9 @@
 
 /* Forecast row flip-in on render */
 @keyframes flipIn {
-    0%   { opacity: 0; transform: translateX(40px) scale(0.9) rotateX(25deg); }
-    60%  { opacity: 1; transform: translateX(-5px) scale(1.02) rotateX(0deg); }
-    100% { opacity: 1; transform: translateX(0) scale(1) rotateX(0deg); }
+    0%   { opacity: 0; transform: translateX(20px) scale(0.97); }
+    60%  { opacity: 1; transform: translateX(-3px) scale(1.01); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
 }
 
 /* ── Extreme Heat Sun ────────────────────────────────────
@@ -227,8 +227,8 @@ body.sunny-extreme #extreme-sun-container { opacity: 1; }
 }
 
 @keyframes pulse-heat {
-    0%   { transform: scale(1);   box-shadow: 0 0 40px #ff9800, 0 0 60px #ff5722; }
-    100% { transform: scale(1.2); box-shadow: 0 0 60px #ff5722, 0 0 120px #f44336; }
+    0%   { transform: scale(1);   box-shadow: 0 0 20px #ff9800, 0 0 30px #ff5722; }
+    100% { transform: scale(1.15); box-shadow: 0 0 30px #ff5722, 0 0 50px #f44336; }
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
@@ -260,21 +260,28 @@ body.sunny-extreme #extreme-sun-container { opacity: 1; }
 
     /* Lighter card blur — still glass-like, much cheaper to render */
     .weather-card {
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
 
     /* Smaller sun, mostly off-screen on mobile anyway */
     #extreme-sun-container {
-        width: 130px;
-        height: 130px;
-        top: 15px;
-        right: 15px;
+        width: 100px;
+        height: 100px;
+        top: 10px;
+        right: 10px;
+    }
+    .sun-core {
+        animation-duration: 3s;
+    }
+    .blazing-sun {
+        animation-duration: 25s;
     }
 
     /* Reduce cloud blur — half the radius = quarter the fill cost */
     .cloud-bit {
-        filter: blur(18px);
+        filter: blur(12px);
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
     }
 
     /* Hover states have no meaning on touch screens */
@@ -282,6 +289,11 @@ body.sunny-extreme #extreme-sun-container { opacity: 1; }
         transform: none;
         background: rgba(0, 0, 0, 0.2);
         box-shadow: none;
+    }
+
+    /* Reduce shooting star filter cost */
+    .shooting-star {
+        filter: none;
     }
 }
 

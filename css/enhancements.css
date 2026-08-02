@@ -257,6 +257,26 @@
     .detail-astro { flex-direction: column; gap: 6px; }
     .detail-astro-item { width: 100%; }
 }
+@media (max-width: 768px) {
+    .fday-detail-stat {
+        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.25);
+        transition: none;
+    }
+    .fday-detail-stat:hover { transform: none; }
+    .detail-hour-card {
+        box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
+        transition: none;
+    }
+    .detail-astro-item {
+        box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
+    }
+    .fday-detail {
+        box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .weather-card {
+        transition: border-color 0.3s ease;
+    }
+}
 
 /* ────────────────────────────────────────────────────────
    6. DAY NAVIGATION BUTTONS (Prev / Next)
@@ -601,10 +621,7 @@ html {
    MOBILE GPU OPTIMIZATIONS (Zero Visual Changes)
 ──────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-    /* Force GPU hardware compositing on heavy layout panels.
-       This prevents lag by ensuring the expensive 3D drop-shadows, 
-       glass blurs, and gradients are rendered as static textures 
-       by the GPU when scrolling. */
+    /* Lightweight GPU layer promotion — no perspective (saves fill-rate). */
     .panel,
     .fday-row,
     .fday-detail,
@@ -615,10 +632,9 @@ html {
         transform: translateZ(0);
         -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
-        perspective: 1000;
     }
     
-    /* Disable unnecessary popping touch effects on mobile to prevent accidental jitter while scrolling */
+    /* Disable hover/active transforms on touch to prevent jitter */
     .hour-card:active,
     .detail-hour-card:active,
     .fday-row:active,
@@ -1111,6 +1127,9 @@ body.severe-weather-alert .site-brand .brand-badge {
 @media (max-width: 768px) {
     .site-header {
         padding: 0 16px;
+        backdrop-filter: blur(10px) saturate(120%);
+        -webkit-backdrop-filter: blur(10px) saturate(120%);
+        box-shadow: 0 1px 0 rgba(0, 242, 254, 0.04), 0 2px 8px rgba(0, 0, 0, 0.2);
     }
     .site-header-inner {
         height: 52px;
@@ -1121,6 +1140,7 @@ body.severe-weather-alert .site-brand .brand-badge {
         display: none;
     }
     .brand-badge { display: none; }
+    .brand-icon { animation: none; }
     
     /* Make the nav links distinct, spaced-out circular buttons */
     .site-nav {
@@ -1158,6 +1178,35 @@ body.severe-weather-alert .site-brand .brand-badge {
     .site-nav { gap: 8px; }
     .nav-link { padding: 7px; }
     .header-status { padding: 7px; }
+}
+
+@media (max-width: 768px) {
+    /* Kill expensive infinite filter/shadow animations on mobile */
+    .main-card-alert-pill.red .alert-icon,
+    .main-card-alert-pill.orange .alert-icon {
+        animation: none;
+    }
+    .alert-banner {
+        animation: slideDownAlert 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        backdrop-filter: blur(6px);
+    }
+    .api-dot {
+        animation: none;
+        opacity: 1;
+    }
+    .nav-link {
+        transition: color 0.2s ease, background 0.2s ease;
+    }
+    .nav-link:hover { transform: none; }
+    .header-status {
+        transition: background 0.2s ease;
+    }
+    .feature-slot {
+        transition: background 0.2s ease;
+    }
+    .city-dock button {
+        transition: background 0.2s ease, transform 0.15s ease;
+    }
 }
 
 /* ════════════════════════════════════════════════════════════
