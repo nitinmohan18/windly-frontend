@@ -98,7 +98,12 @@
     border-radius: 50%;
     opacity: 0.5;
     animation: drift linear infinite;
+
+    /* Hardware acceleration for smooth drift */
     will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 /* ── Wind Lines ──────────────────────────────────────────*/
@@ -175,7 +180,7 @@
     from { transform: translate3d(0, -10vh, 0); }
     to   { transform: translate3d(-10vw, 110vh, 0); }
 }
-@keyframes drift       { from { transform: translateX(-30vw); } to { transform: translateX(120vw); } }
+@keyframes drift       { from { transform: translate3d(-30vw, 0, 0); } to { transform: translate3d(120vw, 0, 0); } }
 @keyframes blow { 
     from { transform: translate3d(-30vw, 0, 0); } 
     to   { transform: translate3d(120vw, 0, 0); } 
@@ -278,10 +283,10 @@ body.sunny-extreme #extreme-sun-container { opacity: 1; }
         animation-duration: 25s;
     }
 
-    /* Reduce cloud blur — half the radius = quarter the fill cost */
+    /* Reduce cloud glow — keep blur baked, just lighten the shadow */
     .cloud-bit {
-        filter: blur(12px);
-        box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+        filter: blur(18px);
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
     }
 
     /* Hover states have no meaning on touch screens */
