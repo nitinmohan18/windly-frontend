@@ -165,8 +165,9 @@
 .fday-detail-stat:hover {
     transform: translateY(-2px);
     background: linear-gradient(145deg, rgba(40, 50, 70, 0.6) 0%, rgba(20, 25, 40, 0.4) 100%);
+    border-color: rgba(0, 242, 254, 0.15);
 }
-.fday-detail-stat .material-icons { font-size: 1.1rem; }
+.fday-detail-stat .material-icons { font-size: 1.1rem; color: var(--primary); opacity: 0.85; }
 .fdd-label {
     font-size: 0.58rem;
     opacity: 0.55;
@@ -205,6 +206,10 @@
         inset 1px 1px 2px rgba(255, 255, 255, 0.12),
         inset -1px -1px 2px rgba(0, 0, 0, 0.4);
 }
+.detail-hour-card:hover {
+    border-color: rgba(0, 242, 254, 0.15);
+    transform: translateY(-1px);
+}
 .detail-hour-card:active { 
     background: linear-gradient(145deg, rgba(15, 20, 30, 0.6) 0%, rgba(5, 10, 15, 0.4) 100%);
     transform: scale(0.94); 
@@ -238,7 +243,7 @@
         inset 1px 1px 2px rgba(255, 255, 255, 0.12),
         inset -1px -1px 3px rgba(0, 0, 0, 0.4);
 }
-.detail-astro-item .material-icons { font-size: 1rem; }
+.detail-astro-item .material-icons { font-size: 1rem; color: var(--primary); opacity: 0.85; }
 .detail-astro-label {
     font-size: 0.62rem;
     opacity: 0.55;
@@ -247,7 +252,7 @@
     display: block;
     margin-bottom: 2px;
 }
-.detail-astro-val { font-size: 0.85rem; font-weight: 700; }
+.detail-astro-val { font-size: 0.85rem; font-weight: 700; color: rgba(255, 255, 255, 0.95); }
 
 @media (max-width: 480px) {
     .fday-detail-grid { grid-template-columns: repeat(2, 1fr); gap: 7px; }
@@ -448,9 +453,10 @@ body.stargazer .msg-pleasant {
 .forecast-placeholder {
     padding: 20px 0;
     text-align: center;
-    opacity: 0.45;
+    opacity: 0.5;
     font-size: 0.82rem;
     font-style: italic;
+    letter-spacing: 0.3px;
 }
 
 /* ────────────────────────────────────────────────────────
@@ -764,9 +770,8 @@ html {
    When a severe warning is active, the app transforms into 
    an emergency state with a rich, radial red glow.
 ════════════════════════════════════════════════════════════ */
-body.severe-weather-alert {
-    /* No longer overriding the background, allowing the beautiful weather theme to show */
-}
+/* body.severe-weather-alert — intentionally unstyled;
+   the beautiful weather theme shows through as-is. */
 
 
 /* ── Seamless Header Integration ── */
